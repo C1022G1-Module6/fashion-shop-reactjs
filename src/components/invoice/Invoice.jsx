@@ -8,10 +8,12 @@ import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { invoiceDetailListAction } from "../../action/invoice/invoiceDetail/action";
 import { Field, Form, Formik } from "formik";
+import invoiceDetailService from "../../service/invoice/invoiceDetailService";
 
 function Invoice() {
   const [showModal, setShowModal] = useState(false);
   const modalContainer = useRef();
+  
   let invoiceDetails = useSelector((state) => state.invoiceDetailState);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -90,11 +92,20 @@ function Invoice() {
             initialValues={{
               quantity: "",
               delete: false,
-              productDTO: "",
+              productDTO: ""
             }}
-            onSubmit={(values, setSubmitting) => {
+            onSubmit={async (values, setSubmitting) => {
               console.log(values);
               setSubmitting(false);
+              let newValues = {
+                ...values,
+                productDTO: { code: +values.productDTO },
+              };
+              try {
+                await invoiceDetailService.add(newValues);
+              } catch (error) {
+                console.log(error);
+              }
             }}
           >
             {({ isSubmitting }) => (
