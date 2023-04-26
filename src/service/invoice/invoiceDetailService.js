@@ -1,4 +1,4 @@
-import request from "../config/http";
+import request from "../../config/http";
 
 const findAll = () => {
     return request.get(`/invoice-detail`);
