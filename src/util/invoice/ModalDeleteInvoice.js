@@ -22,7 +22,7 @@ function ModalDeleteInvoice() {
                 data-bs-dismiss="modal"
                 aria-label="Close"
               >
-                <i className="ti-close text-white" />
+                <i className="bi bi-x-lg text-white" />
               </button>
             </div>
             <div className="modal-body">...</div>
