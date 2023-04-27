@@ -5,6 +5,11 @@ body {
   justify-content: center;
 }
 
+.color {
+  background-color: #183661;
+  color: #ffff
+}
+
 .container {
   box-shadow: 8px 8px 16px 8px rgba(0, 0, 0, 0.2);
 }
@@ -131,3 +136,41 @@ th {
 .customer-info-input {
   width: 500px;
 }
+
+.pagination {
+  list-style: none;
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  font-size: 1.2rem;
+  gap: 5px;
+  margin-top: 20px;
+}
+.pagination .page-num,
+.pagination .page-previous,
+.pagination .page-next {
+  padding: 8px 15px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-weight: 400;
+  display: block;
+}
+
+/* .pagination .page-num:hover,
+.pagination .page-previous,
+.pagination .page-next {
+  background-color: #0b5ed7;
+  color: white;
+}
+
+.pagination a {
+  text-decoration: none;
+}
+
+.pagination .active {
+  background-color: #0b5ed7;
+}
+
+.pagination .active .page-num {
+  color: #fff;
+} */

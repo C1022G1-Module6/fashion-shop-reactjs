@@ -1,6 +1,6 @@
 import React from "react";
 
-function ModalDeleteInvoice() {
+function ModalDeleteInvoice(props) {
   return (
     <>
       <div
@@ -25,7 +25,12 @@ function ModalDeleteInvoice() {
                 <i className="bi bi-x-lg text-white" />
               </button>
             </div>
-            <div className="modal-body">...</div>
+            <div className="modal-body">
+              <div className="modal-body">
+                Bạn có chắc muốn xóa sản phẩm{" "}
+                <span className="text-danger">{props.deletedName}</span>?
+              </div>
+            </div>
             <div className="modal-footer">
               <button
                 type="button"
@@ -34,7 +39,12 @@ function ModalDeleteInvoice() {
               >
                 Thoát
               </button>
-              <button type="button" className="btn btn-outline-danger">
+              <button
+                type="button"
+                className="btn btn-outline-danger"
+                data-bs-dismiss="modal"
+                onClick={() => props.onCompletedDelete()}
+              >
                 Xóa
               </button>
             </div>
