@@ -1,7 +1,10 @@
 
 // import './App.css';
+
+import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import Login from './components/Login';
+import EmployeeDetail from './components/EmployeeDetail';
 
 import Notification from './components/notification/Notification';
 import NotificationCreate from './components/notification/NotificationCreate';
@@ -18,9 +21,10 @@ function App() {
   <Route path='/invoice' element={<Invoice />} />
 
 
+      <Route path='/employee' element={<EmployeeDetail />} />
     </Routes>
     </>
-  
+
   );
 }
 

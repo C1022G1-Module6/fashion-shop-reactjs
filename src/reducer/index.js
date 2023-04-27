@@ -1,12 +1,10 @@
-
 // import { combineReducers } from "redux";
-// import { notificationReducer , showNotification, showDetailNotification } from "./notification";
-
-
-// export const rootReducer = combineReducers({
-//     notifications: notificationReducer,
-//     show: showNotification,
-//     showDetail: showDetailNotification
+// import { loginReducer } from './loginReducer';
+// import { employeeReducer } from "./employeeReducer";
 
 // })
 
+// export const rootReducer = combineReducers({
+//     login: loginReducer,
+//     employeeDetail: employeeReducer
+// })
