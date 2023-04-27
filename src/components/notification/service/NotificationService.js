@@ -1,5 +1,15 @@
 import axios from "axios"
-export const getAllNotification = async() =>{
+export const getAllNotification = async(page) =>{
+    try {
+        let res = await axios.get(`http://localhost:8080/notifications?page=${page ? page : '0'}`)
+
+        return res.data.content
+    } catch (error) {
+        
+    }
+}
+
+export const getTotalNotification = async() =>{
     try {
         let res = await axios.get(`http://localhost:8080/notifications`)
 
@@ -29,8 +39,8 @@ export const findById = async(id) =>{
 export const save = async(values) =>{
 
     try {
-        await axios.post(`http://localhost:8080/notifications`, {...values})
+       return await axios.post(`http://localhost:8080/notifications/create`, { ...values })
     } catch (error) {
-        
+        console.log(error);
     }
 }

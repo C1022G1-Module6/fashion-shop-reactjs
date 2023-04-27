@@ -38,3 +38,6 @@ yarn-error.log*
 !.vscode/extensions.json
 .history/*
 
+node_modules
+node_modules
+node_modules

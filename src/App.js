@@ -7,13 +7,16 @@ import NotificationDetailList from './components/notification/NotificationDetail
 
 function App() {
   return (
-    <Routes>
+    <>
+      <Routes>
       <Route path='/' element={<Login />} />
       <Route path='/notifications' element={<Notification />} />
       <Route path='/notifications/detail/:id' element={<NotificationDetailList />} />
       <Route path='/notifications/create' element={<NotificationCreate />} />
 
     </Routes>
+    </>
+  
   );
 }
 

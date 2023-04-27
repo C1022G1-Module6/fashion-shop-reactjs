@@ -2,14 +2,30 @@ import React, { useState } from 'react'
 import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import * as NotificationService from './service/NotificationService'
+import ReactPaginate from 'react-paginate';
+
 export default function Notification() {
-
+    const [pageCount, setPageCount] = useState(0)
+    let [count, setCount] = useState(1)
+    const [currentPage, setCurrentPage] = useState(0)
     const [notification, setNotification] = useState([])
-
     const listNotification = async () => {
-        let res = await NotificationService.getAllNotification()
-        return setNotification(res)
+        let res = await NotificationService.getAllNotification(currentPage)
+        setNotification(res)
+        setPageCount(res.data.totalPages)
+       
+       
+
     }
+    console.log(pageCount);
+    const handlePageClick = async (page) => {
+        setCurrentPage(page.selected)
+        const rs = await NotificationService.getAllNotification( page.selected)
+        setNotification(rs)
+        setCount(Math.ceil(rs.data.size * page.selected + 1))
+    }
+   
+
     console.log(notification);
 
     useEffect(() => {
@@ -37,11 +53,15 @@ export default function Notification() {
 
 
                         <div className="row">
-                            {
-                                notification?.map((nitifyList, index) => (
-                                    <div className="col-sm-12 col-md-6 col-xl-6 col-xxl-6 col-lg-6" key={index}>
+                            {  
+                                notification
+                                // ?.slice(currentPage * 3, currentPage * 3 + 3)
+                                ?.map((nitifyList, index ) => (
+                                    
+                                    <div  className="col-sm-12 col-md-6 col-xl-6 col-xxl-6 col-lg-6"  key={index}>
+                                        
                                         <div className="caxrd h-100" style={{ boxShadow: "8px 8px 16px 8px rgba(0, 0, 0, 0.2)" }}>
-
+                                        
 
                                             <img className="card-img-top" src={nitifyList.img} alt="" />
 
@@ -54,9 +74,12 @@ export default function Notification() {
                                             {/* <div className="card-footer">
                             <small className="text-muted">Last updated 3 mins ago</small>
                         </div> */}
+                        
                                         </div>
                                     </div>
+                                    
                                 ))
+                                
                             }
                         </div>
 
@@ -64,11 +87,30 @@ export default function Notification() {
 
                     <div className="col-sm-12 col-md-3 col-xl-3 col-xxl-2 col-lg-3  ">
                     </div>
+                    
                 </div>
 
 
-
+                <ReactPaginate 
+                    previousLabel="Trước"
+                    nextLabel="Sau"
+                    pageCount={pageCount}
+                    onPageChange={handlePageClick}
+                    containerClassName='pagination'
+                    previousClassName='page-item'
+                    previousLinkClassName='page-link'
+                    nextClassName= 'page-item'
+                    nextLinkClassName='page-link'
+                    pageClassName='page-item'
+                    pageLinkClassName='page-link'
+                    activeClassName='active'
+                    activeLinkClassName='page-link'
+                    forcePage={currentPage}
+                />
+                
             </div>
+          
         </>
+        
     )
 }
