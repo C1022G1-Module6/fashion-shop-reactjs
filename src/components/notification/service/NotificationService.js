@@ -1,9 +1,7 @@
 import axios from "axios"
-export const getAllNotification = async(page) =>{
+export const getAllNotification = (page) =>{
     try {
-        let res = await axios.get(`http://localhost:8080/notifications?page=${page ? page : '0'}`)
-
-        return res.data.content
+        return  axios.get(`http://localhost:8080/notifications?page=${page ? page : '0'}`)
     } catch (error) {
         
     }

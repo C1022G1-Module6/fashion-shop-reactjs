@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { NavLink } from 'react-router-dom'
 import * as NotificationService from './service/NotificationService'
 import ReactPaginate from 'react-paginate';
+import './../notification/notifications.css'
 
 export default function Notification() {
     const [pageCount, setPageCount] = useState(0)
@@ -11,7 +12,7 @@ export default function Notification() {
     const [notification, setNotification] = useState([])
     const listNotification = async () => {
         let res = await NotificationService.getAllNotification(currentPage)
-        setNotification(res)
+        setNotification(res.data.content)
         setPageCount(res.data.totalPages)
        
        
@@ -21,7 +22,7 @@ export default function Notification() {
     const handlePageClick = async (page) => {
         setCurrentPage(page.selected)
         const rs = await NotificationService.getAllNotification( page.selected)
-        setNotification(rs)
+        setNotification(rs.data.content)
         setCount(Math.ceil(rs.data.size * page.selected + 1))
     }
    
@@ -30,7 +31,7 @@ export default function Notification() {
 
     useEffect(() => {
         listNotification()
-    }, [])
+    }, [currentPage])
 
     return (
         <>
@@ -89,24 +90,25 @@ export default function Notification() {
                     </div>
                     
                 </div>
+                <div style={{marginLeft: '45%'}}>
+                <ReactPaginate
+                
+                breakLabel="..."
+                nextLabel=">"
+                onPageChange={handlePageClick}
+                pageCount={pageCount}
+                previousLabel="< "
+                containerClassName="pagination"
+                pageLinkClassName="page-num"
+                nextLinkClassName="page-next"
+                previousLinkClassName="page-previous"
+                activeClassName="active"
+                disabledClassName="d-none"
+              />
+                </div>
+                            
 
-
-                <ReactPaginate 
-                    previousLabel="Trước"
-                    nextLabel="Sau"
-                    pageCount={pageCount}
-                    onPageChange={handlePageClick}
-                    containerClassName='pagination'
-                    previousClassName='page-item'
-                    previousLinkClassName='page-link'
-                    nextClassName= 'page-item'
-                    nextLinkClassName='page-link'
-                    pageClassName='page-item'
-                    pageLinkClassName='page-link'
-                    activeClassName='active'
-                    activeLinkClassName='page-link'
-                    forcePage={currentPage}
-                />
+              
                 
             </div>
           
