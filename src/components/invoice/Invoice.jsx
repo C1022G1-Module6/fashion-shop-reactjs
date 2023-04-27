@@ -33,6 +33,21 @@ function Invoice() {
     payment: "",
     bonusPoint: "",
   });
+  const [customerCode, setCustomerCode] = useState("");
+
+  const handleTransferCustomerCode = (id,code) => {
+    const tr = document.querySelector(`.tr${id}`)
+    if (tr.classList.contains("color")) {
+      tr.classList.remove("color")
+    } else {
+      tr.classList.add("color")
+    }
+    setCustomerCode(code)
+  }
+
+  const resetCustomerValue = () => {
+    setCustomerCode("")
+  }
 
   const handlePageClick = (event) => {
     setCustomerFilter((prev) => ({ ...prev, page: event.selected }));
@@ -76,11 +91,14 @@ function Invoice() {
   // Tính tổng (total)
   useEffect(() => {
     const calculateTotal = () => {
-      const sum = invoiceDetails.reduce((acc, invoiceDetail) => {
+      let sum = invoiceDetails.reduce((acc, invoiceDetail) => {
         return (
           acc + invoiceDetail.quantity * invoiceDetail.productDTO.sellingPrice
         );
       }, 0);
+      if (!isSubmitting) {
+        sum = 0;
+      }
       setInvoiceFilter((prev) => ({ ...prev, total: sum }));
     };
     calculateTotal();
@@ -134,7 +152,7 @@ function Invoice() {
         customerFilter
       );
       setCustomers(customersResponse.data.content);
-      setPageCount(customersResponse.data.totalPages)
+      setPageCount(customersResponse.data.totalPages);
     };
     getCustomers();
   }, [customerFilter]);
@@ -200,6 +218,8 @@ function Invoice() {
                     placeholder="Mã khách hàng"
                     id="customer-code"
                     name="invoice.customerDTO"
+                    value={customerCode}
+                    onChange={() => resetCustomerValue()}
                   />
                   <button
                     type="button"
@@ -396,38 +416,49 @@ function Invoice() {
               <div className="container" style={{ boxShadow: "none" }}>
                 <div className="content row">
                   <div className="col-12">
-                    <Formik
-                      initialValues={{
-                        name: customerFilter.name,
-                      }}
-                      onSubmit={(values) => {
-                        setCustomerFilter((prev) => {
-                          return { ...prev, ...values, page: 0 };
-                        });
-                      }}
-                    >
-                      <Form>
-                        <div className="mb-3 input-search d-flex justify-content-between">
-                          <Field
-                            type="text"
-                            className="customer-info-input input_field"
-                            placeholder="Nhập mã KH, tên KH hoặc SĐT"
-                            name="name"
-                          />
-                          <div>
-                            <button className="btn btn-outline-primary me-2">
-                              <i className="bi bi-search" />
-                            </button>
-                            <button type="submit" className="btn btn-primary">
-                              Chọn
-                            </button>
+                    <div className="d-flex justify-content-between">
+                      <Formik
+                        initialValues={{
+                          name: customerFilter.name,
+                        }}
+                        onSubmit={(values) => {
+                          setCustomerFilter((prev) => {
+                            return { ...prev, ...values, page: 0 };
+                          });
+                        }}
+                      >
+                        <Form>
+                          <div className="mb-3 input-search d-flex justify-content-between">
+                            <Field
+                              type="text"
+                              className="customer-info-input input_field"
+                              placeholder="Nhập mã KH, tên KH hoặc SĐT"
+                              name="name"
+                            />
+                            <div>
+                              <button
+                                type="submit"
+                                className="btn btn-outline-primary me-2"
+                              >
+                                <i className="bi bi-search" />
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      </Form>
-                    </Formik>
+                        </Form>
+                      </Formik>
+
+                      <button
+                        className="btn btn-primary"
+                        style={{ height: "39px"}}
+                        onClick={() => setShowModal(false)}
+                      >
+                        Chọn
+                      </button>
+                    </div>
+
                     <div className="mb-3">
                       <div className="table-responsive p-0">
-                        <table className="table table-striped">
+                        <table className="table">
                           <thead>
                             <tr>
                               <th>STT</th>
@@ -438,7 +469,7 @@ function Invoice() {
                           </thead>
                           <tbody>
                             {customers.map((customer, index) => (
-                              <tr key={index}>
+                              <tr className={`tr${customer.id}`} key={index} onClick={() => handleTransferCustomerCode(customer.id,customer.code)}>
                                 <td>{++index}</td>
                                 <td>{customer.code}</td>
                                 <td>{customer.name}</td>
@@ -449,18 +480,21 @@ function Invoice() {
                         </table>
                       </div>
                     </div>
-                    <div className="text" />
+                    <div />
                     <div className="d-grid">
                       <ReactPaginate
                         breakLabel="..."
-                        nextLabel=">"
+                        nextLabel="Sau"
                         onPageChange={handlePageClick}
                         pageCount={pageCount}
-                        previousLabel="< "
+                        previousLabel="Trước"
                         containerClassName="pagination"
-                        pageLinkClassName="page-num"
-                        nextLinkClassName="page-next"
-                        previousLinkClassName="page-previous"
+                        pageClassName="page-item"
+                        pageLinkClassName="page-link"
+                        nextClassName="page-item"
+                        nextLinkClassName="page-link"
+                        previousClassName="page-item"
+                        previousLinkClassName="page-link"
                         activeClassName="active"
                         disabledClassName="d-none"
                       />

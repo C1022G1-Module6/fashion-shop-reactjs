@@ -5,6 +5,11 @@ body {
   justify-content: center;
 }
 
+.color {
+  background-color: #183661;
+  color: #ffff
+}
+
 .container {
   box-shadow: 8px 8px 16px 8px rgba(0, 0, 0, 0.2);
 }
@@ -151,7 +156,7 @@ th {
   display: block;
 }
 
-.pagination .page-num:hover,
+/* .pagination .page-num:hover,
 .pagination .page-previous,
 .pagination .page-next {
   background-color: #0b5ed7;
@@ -168,4 +173,4 @@ th {
 
 .pagination .active .page-num {
   color: #fff;
-}
+} */
