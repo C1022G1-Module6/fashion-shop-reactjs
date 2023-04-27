@@ -8,8 +8,8 @@ const saveProduct = () => {
     return request.post(`/api/user/product/create-product`)
 }
 
-const getAllProductDetail = () => {
-    return request.get(`/api/user/product/detail`)
+const getAllProductDetail = (id) => {
+    return request.get(`/api/user/product/detail?id=${id}`)
 }
 const productService = {
 findAll,
