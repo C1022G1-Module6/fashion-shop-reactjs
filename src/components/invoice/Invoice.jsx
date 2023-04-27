@@ -7,13 +7,21 @@ import "./media_query.css";
 import { useRef } from "react";
 import { Field, Form, Formik } from "formik";
 import invoiceDetailService from "../../service/invoice/invoiceDetailService";
-import invoiceService from "../../service/invoice/invoiceService"
+import invoiceService from "../../service/invoice/invoiceService";
+import customerForInvoiceService from "../../service/customer/customerForInvoiceService";
+import ReactPaginate from "react-paginate";
 
 function Invoice() {
   const [showModal, setShowModal] = useState(false);
   const [invoiceDetails, setInvoiceDetails] = useState([]);
   const [isSubmitting, setSubmitting] = useState(false);
   const [invoice, setInvoice] = useState();
+  const [customers, setCustomers] = useState([]);
+  const [pageCount, setPageCount] = useState(0);
+  const [customerFilter, setCustomerFilter] = useState({
+    name: "",
+    page: 0,
+  });
   const modalContainer = useRef();
   const [deletedObject, setDeletedObject] = useState({
     deletedId: "",
@@ -25,13 +33,16 @@ function Invoice() {
     payment: "",
     bonusPoint: "",
   });
- 
+
+  const handlePageClick = (event) => {
+    setCustomerFilter((prev) => ({ ...prev, page: event.selected }));
+  };
+
   const handleSubmitInvoiceDetail = async (values) => {
     let newValues = {
       ...values,
       productDTO: { code: +values.productDTO },
     };
-    console.log(newValues);
     try {
       await invoiceDetailService.add(newValues);
       if (values.quantity !== "" && values.productDTO !== "") {
@@ -42,11 +53,11 @@ function Invoice() {
         setSubmitting(newIsSubmitting);
       }
     } catch (error) {
-      console.log(error);
+      console.warn(error);
     }
   };
 
-  const handleSubmitInvoice = () => {}
+  const handleSubmitInvoice = () => {};
 
   const handleTransferInfo = (deletedObject) => {
     setDeletedObject((prev) => ({ ...prev, ...deletedObject }));
@@ -70,7 +81,7 @@ function Invoice() {
           acc + invoiceDetail.quantity * invoiceDetail.productDTO.sellingPrice
         );
       }, 0);
-      setInvoiceFilter((prev) => ({...prev, total: sum}));
+      setInvoiceFilter((prev) => ({ ...prev, total: sum }));
     };
     calculateTotal();
   }, [isSubmitting, invoiceDetails, invoiceFilter.total]);
@@ -107,13 +118,26 @@ function Invoice() {
     };
   }, [showModal]);
 
+  // Lấy hóa đơn chi tiết
   useEffect(() => {
     const getInvoice = async () => {
-      const invoiceResponse = await invoiceService.getDetail()
-      setInvoice(invoiceResponse)
-    } 
-    getInvoice()
-  }, [isSubmitting])
+      const invoiceResponse = await invoiceService.getDetail();
+      setInvoice(invoiceResponse.data);
+    };
+    getInvoice();
+  }, [isSubmitting]);
+
+  // Lấy mảng khách hàng
+  useEffect(() => {
+    const getCustomers = async () => {
+      const customersResponse = await customerForInvoiceService.findCustomer(
+        customerFilter
+      );
+      setCustomers(customersResponse.data.content);
+      setPageCount(customersResponse.data.totalPages)
+    };
+    getCustomers();
+  }, [customerFilter]);
 
   return (
     <>
@@ -132,13 +156,12 @@ function Invoice() {
             delete: false,
             productDTO: "",
           },
-
         }}
         onSubmit={(values) => {
           if (values.invoice.payment === "") {
-            handleSubmitInvoiceDetail(values.invoiceDetail)
+            handleSubmitInvoiceDetail(values.invoiceDetail);
           } else {
-            handleSubmitInvoice(values.invoice)
+            handleSubmitInvoice(values.invoice);
           }
         }}
       >
@@ -153,11 +176,7 @@ function Invoice() {
                   <label htmlFor="" className="fw-bold">
                     Mã hóa đơn<span className="colon">:</span>
                   </label>
-                  {isSubmitting ? (
-                    <span>{invoice.code}</span>
-                  ) : (
-                    <span></span>
-                  )}
+                  {isSubmitting ? <span>{invoice.code}</span> : <span></span>}
                 </div>
               </div>
               <div className="row mb-3 input-search p-0">
@@ -165,7 +184,7 @@ function Invoice() {
                   <label htmlFor="" className="fw-bold">
                     Ngày tháng năm<span className="colon">:</span>{" "}
                   </label>
-                  <span>26/07/1998</span>
+                  {isSubmitting ? <span>{invoice.date}</span> : <span></span>}
                 </div>
               </div>
               <div className="row mb-3 input-search p-0">
@@ -194,33 +213,6 @@ function Invoice() {
                   </button>
                 </div>
               </div>
-
-              {/* <Formik
-                initialValues={{
-                  quantity: "",
-                  delete: false,
-                  productDTO: "",
-                }}
-                onSubmit={async (values) => {
-                  let newValues = {
-                    ...values,
-                    productDTO: { code: +values.productDTO },
-                  };
-                  try {
-                    await invoiceDetailService.add(newValues);
-                    if (values.quantity !== "" && values.productDTO !== "") {
-                      setSubmitting(true);
-                    }
-                    if (isSubmitting) {
-                      const newIsSubmitting = { ...isSubmitting };
-                      setSubmitting(newIsSubmitting);
-                    }
-                  } catch (error) {
-                    console.log(error);
-                  }
-                }}
-              > */}
-              {/* <Form name="invoice-detail"> */}
               <div className="row">
                 <fieldset className="border border-secondary p-2 mb-3 w-100">
                   <legend className="float-none w-auto p-2 fs-5 fw-bold">
@@ -404,19 +396,35 @@ function Invoice() {
               <div className="container" style={{ boxShadow: "none" }}>
                 <div className="content row">
                   <div className="col-12">
-                    <div className="mb-3 input-search d-flex justify-content-between">
-                      <input
-                        type="text"
-                        className="customer-info-input input_field"
-                        placeholder="Nhập mã KH, tên KH hoặc SĐT"
-                      />
-                      <div>
-                        <button className="btn btn-outline-primary me-2">
-                          <i className="bi bi-search" />
-                        </button>
-                        <button className="btn btn-primary">Chọn</button>
-                      </div>
-                    </div>
+                    <Formik
+                      initialValues={{
+                        name: customerFilter.name,
+                      }}
+                      onSubmit={(values) => {
+                        setCustomerFilter((prev) => {
+                          return { ...prev, ...values, page: 0 };
+                        });
+                      }}
+                    >
+                      <Form>
+                        <div className="mb-3 input-search d-flex justify-content-between">
+                          <Field
+                            type="text"
+                            className="customer-info-input input_field"
+                            placeholder="Nhập mã KH, tên KH hoặc SĐT"
+                            name="name"
+                          />
+                          <div>
+                            <button className="btn btn-outline-primary me-2">
+                              <i className="bi bi-search" />
+                            </button>
+                            <button type="submit" className="btn btn-primary">
+                              Chọn
+                            </button>
+                          </div>
+                        </div>
+                      </Form>
+                    </Formik>
                     <div className="mb-3">
                       <div className="table-responsive p-0">
                         <table className="table table-striped">
@@ -429,62 +437,33 @@ function Invoice() {
                             </tr>
                           </thead>
                           <tbody>
-                            <tr className="tr1">
-                              <td>01</td>
-                              <td>231</td>
-                              <td>Nguyễn Văn A</td>
-                              <td>0905889885</td>
-                            </tr>
-                            <tr>
-                              <td>02</td>
-                              <td>232</td>
-                              <td>Nguyễn Văn B</td>
-                              <td>0905161858</td>
-                            </tr>
-                            <tr>
-                              <td>03</td>
-                              <td>233</td>
-                              <td>Nguyễn Văn C</td>
-                              <td>0932591241</td>
-                            </tr>
+                            {customers.map((customer, index) => (
+                              <tr key={index}>
+                                <td>{++index}</td>
+                                <td>{customer.code}</td>
+                                <td>{customer.name}</td>
+                                <td>{customer.phoneNumber}</td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>
                     </div>
                     <div className="text" />
-                    <div>
-                      <nav
-                        aria-label="Page navigation example"
-                        className="d-flex justify-content-center"
-                      >
-                        <ul className="pagination">
-                          <li className="page-item">
-                            <a className="page-link" href="#">
-                              <i className="bi bi-chevron-left" />
-                            </a>
-                          </li>
-                          <li className="page-item active">
-                            <a className="page-link" href="#">
-                              1
-                            </a>
-                          </li>
-                          <li className="page-item">
-                            <a className="page-link" href="#">
-                              2
-                            </a>
-                          </li>
-                          <li className="page-item">
-                            <a className="page-link" href="#">
-                              3
-                            </a>
-                          </li>
-                          <li className="page-item">
-                            <a className="page-link" href="#">
-                              <i className="bi bi-chevron-right" />
-                            </a>
-                          </li>
-                        </ul>
-                      </nav>
+                    <div className="d-grid">
+                      <ReactPaginate
+                        breakLabel="..."
+                        nextLabel=">"
+                        onPageChange={handlePageClick}
+                        pageCount={pageCount}
+                        previousLabel="< "
+                        containerClassName="pagination"
+                        pageLinkClassName="page-num"
+                        nextLinkClassName="page-next"
+                        previousLinkClassName="page-previous"
+                        activeClassName="active"
+                        disabledClassName="d-none"
+                      />
                     </div>
                   </div>
                 </div>
