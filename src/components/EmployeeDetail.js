@@ -37,23 +37,39 @@ export default function EmployeeDetail() {
                             localStorage.removeItem('token')
                             navigate('/')
                         } catch (error) {
-                           const err = error.response.data.message
-                            if(err === "Mật khẩu hiện tại không đúng"){
+                           const err = error.response.data
+                           console.log(err);
+                            if(err.message === "Mật khẩu hiện tại không đúng"){
                                 document.getElementById("oldPasswordErr").innerHTML = "Mật khẩu hiện tại không đúng"
-                            } else{
+                            }else if(err.oldPassword === "Không được bỏ trống"){
+                                document.getElementById("oldPasswordErr").innerHTML = "Không được bỏ trống"
+                            }else if(err.oldPassword === "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự"){
+                                document.getElementById("oldPasswordErr").innerHTML = "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự"
+                            }else{
                                 document.getElementById("oldPasswordErr").innerHTML = ""
                             }
-                            if(err === "Mật khẩu mới không được trùng với mật khẩu cũ"){
+
+                            if(err.message === "Mật khẩu mới không được trùng với mật khẩu cũ"){
                                 document.getElementById("newPasswordErr").innerHTML = "Mật khẩu mới không được trùng với mật khẩu cũ"
-                            } else{
+                            } else if(err.newPassword === "Không được bỏ trống"){
+                                document.getElementById("newPasswordErr").innerHTML = "Không được bỏ trống"
+                            }else if(err.newPassword === "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự"){
+                                document.getElementById("newPasswordErr").innerHTML = "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự"
+                            }else{
                                 document.getElementById("newPasswordErr").innerHTML = ""
                             }
-                            if(err === "Mật khẩu xác nhận không trùng khớp"){
+                            
+
+                            if(err.message === "Mật khẩu xác nhận không trùng khớp"){
                                 document.getElementById("confirmPasswordErr").innerHTML = "Mật khẩu xác nhận không trùng khớp"
+                            } else if(err.confirmPassword === "Không được bỏ trống"){
+                                document.getElementById("confirmPasswordErr").innerHTML = "Không được bỏ trống"
+                            }else if(err.confirmPassword === "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự"){
+                                document.getElementById("confirmPasswordErr").innerHTML = "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự"
                             }else{
                                 document.getElementById("confirmPasswordErr").innerHTML = ""
                             }
-                            
+                           
                         }
                     }
                     changePassword()
