@@ -8,7 +8,7 @@ import productSizeService from "../../service/product/ProductSizeService";
 function AddProductForm() {
 const [productAdd,setProductAdd] = useState([]);
 const [productTypes,setProductTypes] = useState();
-const [productSizes,setProductSizes] = useState();
+const [productSizes,setProductSizes] = useState([]);
 
 let navigate = useNavigate();
 
