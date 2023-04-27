@@ -1,8 +1,8 @@
 import request from "../../request";
 
-const listAll = () => {
+const listAll = ({month}) => {
     try {
-        return request.get(`/statistics`);
+        return request.get(`/statistics?month=${month}`);
     } catch(error){
         console.log(error);
     }

@@ -1,24 +1,28 @@
 import React from "react";
 import { Line } from "react-chartjs-2";
+import '../../App.css';
 function LineChart({ chartData }) {
   return (
-    <div className="chart-container">
-      <h2 style={{ textAlign: "center" }}>Line Chart</h2>
+    <>
+    <div style={{ width: "1000px"}}>
       <Line
         data={chartData}
         options={{
           plugins: {
             title: {
               display: true,
-              text: "Users Gained between 2016-2020"
+              text: "Doanh thu năm 2023",
+              width: "50px"
             },
-            legend: {
-              display: false
+            layout: {
+              display: true,
+              width: "1000px"
             }
           }
         }}
       />
     </div>
+    </>
   );
 }
 export default LineChart;
