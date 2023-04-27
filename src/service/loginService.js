@@ -4,8 +4,13 @@ const login = (value)=>{
     return request.post('/login', { ...value })
 }
 
-const changePassword = ()=>{
-    return request.put('/change-password')
+const changePassword = (value)=>{
+    const token = localStorage.getItem('token')
+    return request.put('/change-password',{ ...value }, {
+        headers : {
+            'Authorization': `Bearer ${token}`
+        }
+    })
 }
 
 const loginService = {
