@@ -67,7 +67,7 @@ export default function Notification() {
                                             <img className="card-img-top" src={nitifyList.img} alt="" />
 
                                             <div className="card-body">
-                                                <NavLink to={`/notifications/detail/${nitifyList.id}`} style={{ textDecoration: "none" }}>
+                                                <NavLink to={`/notifications/detail/${nitifyList.id}`} style={{ textDecoration: "none",color:'black' }}>
                                                     <h4 className="card-title">{nitifyList.title}</h4>
                                                 </NavLink>
 
