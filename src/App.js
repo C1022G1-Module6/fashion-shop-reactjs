@@ -5,7 +5,7 @@ import Invoice from './components/invoice/Invoice';
 function App() {
   return (
     <Routes>
-      <Route path='/' element={<Invoice />} />
+      <Route path='/invoice' element={<Invoice />} />
     </Routes>
   );
 }
