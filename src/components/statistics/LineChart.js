@@ -1,5 +1,6 @@
 import React from "react";
-import { Line } from "react-chartjs-2";
+// import { Line } from "react-chartjs-2";
+import {Line} from "react-chartjs-2"
 import '../../App.css';
 function LineChart({ chartData }) {
   return (

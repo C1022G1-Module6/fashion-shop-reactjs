@@ -1,5 +1,7 @@
+// import Chart from "chart.js/auto";
+// import { CategoryScale } from "chart.js";
 import Chart from "chart.js/auto";
-import { CategoryScale } from "chart.js";
+import {CategoryScale} from "chart.js"
 import { useEffect, useState } from "react";
 import LineChart from "./LineChart";
 import listAll from "../../service/statistics/statisticsService";
