@@ -8,9 +8,14 @@ const add = (invoiceDetail) => {
     return request.post(`/invoice-detail`, {...invoiceDetail})
 }
 
+const remove = (id) => {
+    return request.delete(`/invoice-detail/${id}`)
+}
+
 const invoiceDetailService = {
     findAll,
-    add
+    add,
+    remove
 }
 
 export default invoiceDetailService;
