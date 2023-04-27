@@ -3,7 +3,8 @@ import './App.css';
 // import { Route, Routes } from 'react-router-dom';
 // import Login from './components/Login';
 // import Invoice from './components/invoice/Invoice';
-import Statistics from './components/statistics/statistics';
+// import Statistics from './components/statistics/statistics';
+import DataEntry from "./components/data-entry/dataEntry"
 
 
 
@@ -11,7 +12,8 @@ import Statistics from './components/statistics/statistics';
 function App() {
   return (
     <div className="App d-flex justify-content-center">
-    <Statistics/>
+    {/* <Statistics/> */}
+    <DataEntry />
     </div>
   );
 }

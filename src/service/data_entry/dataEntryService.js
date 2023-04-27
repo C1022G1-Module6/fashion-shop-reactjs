@@ -8,10 +8,14 @@ const update = (dataEntry) => {
     return request.put(`/data-entry`, {...dataEntry})
 };
 
-
-const dataEntry = {
-    findAll,
-    update,
+const getDetail = () => {
+    return request.get(`/data-entry/detail`);
 };
 
-export default dataEntry;
+const dataEntryService = {
+    findAll,
+    update,
+    getDetail
+};
+
+export default dataEntryService;
