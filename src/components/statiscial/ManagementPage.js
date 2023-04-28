@@ -351,16 +351,16 @@ export default function ManagementPage() {
                             <div className="col-4 " style={{textAlign: "center"}}>
                                 <div className="card text-center mb-3 shadow">
                                     <div className="card-body" style={{height: 184}}>
-                                        <h5 className="card-title">
-                                            <i data-feather="user"/>
-                                        </h5>
-                                        <p className="card-text">Lượng khách</p>
+                                        <p className="card-title">
+                                            <i className='bx bxs-user'></i>
+                                        </p>
+                                        <p className="card-text" style={{marginBottom: -8}}>Lượng khách</p>
                                         {
                                             customerList.map((value, index) => (
                                                 <>
-                                                    <p style={{fontSize: "xx-large"}}
+                                                    <p style={{fontSize: "xx-large",marginBottom: 1}}
                                                        key={index}>{value.current}</p>
-                                                    <span style={{fontSize: "large"}}>{value.percent}</span>
+                                                    <span style={{fontSize: "large"}}>{value.percent} %</span>
                                                     <span
                                                         style={{fontSize: "large"}}> so với tuần trước</span>
                                                 </>
@@ -372,14 +372,14 @@ export default function ManagementPage() {
                             <div className="col-4 " style={{textAlign: "center"}}>
                                 <div className="card text-center mb-3 shadow">
                                     <div className="card-body" style={{height: 184}}>
-                                        <h5 className="card-title">
-                                            <i data-feather="shopping-bag"/>
-                                        </h5>
-                                        <p className="card-text">Đơn hàng</p>
+                                        <p className="card-title">
+                                            <i className='bx bxs-pie-chart-alt-2'></i>
+                                        </p>
+                                        <p className="card-text" style={{marginBottom: -8}}>Đơn hàng</p>
                                         {
                                             orderList.map((ol, index) => (
                                                 <>
-                                                    <p style={{fontSize: "xx-large"}}
+                                                    <p style={{fontSize: "xx-large",marginBottom: 1}}
                                                        key={index}>{ol.current}</p>
                                                     <span style={{fontSize: "large"}}>{ol.percent} %</span>
                                                     <span
