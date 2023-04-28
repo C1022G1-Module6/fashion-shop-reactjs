@@ -1,18 +1,18 @@
 import {useEffect, useState} from "react";
 import {
     findAllCustomer,
-    findNumberOfOrder, findRevenueInWeek,
+    findNumberOfOrder, findRevenueInMonth, findRevenueInWeek,
     findTopEmployees,
     findTopProduct
 } from "../../service/statiscial/statiscialService";
-
+import "./management.css"
 export default function ManagementPage() {
     const [customerList, setCustomerList] = useState([])
     const [orderList, setOrderList] = useState([])
     const [employeeList, setEmployeeList] = useState([])
     const [productList, setProductList] = useState([])
     const [revenueList, setRevenueList] = useState(null)
-    const [type, setType] = useState(1)
+    const [type, setType] = useState()
 
     useEffect(() => {
             const listCustomer = async () => {
@@ -40,27 +40,28 @@ export default function ManagementPage() {
 
     const revenueWeek = async () => {
         const rw = await findRevenueInWeek();
+        console.log(rw.data);
         setRevenueList(rw.data);
     }
     const revenueMonth = async () => {
-        const rm = await findRevenueInWeek();
+        const rm = await findRevenueInMonth();
+        console.log(rm.data);
         setRevenueList(rm.data);
     }
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-        switch (type) {
-            case 1:
-                revenueWeek();
-                break;
-            case 2:
-                revenueMonth();
-                break;
-        }
-    })
     const handleChange = event => {
         setType(event.target.value);
     };
+
+    useEffect(() => {
+        switch (type) {
+            case "1":
+                revenueWeek();
+                break;
+            case "2":
+                revenueMonth();
+                break;
+        }
+    },[type]);
     return (
         <>
             <div className="row mx-0">
@@ -400,9 +401,8 @@ export default function ManagementPage() {
                                             </div>
                                             <div className="col-6">
                                                 <select onChange={handleChange}
-                                                        className="form-select"
                                                         aria-label="Default select example"
-                                                        style={{width: 115}}
+                                                        style={{width: 98,height:24,borderRadius:12}}
                                                 >
                                                     <option value={1}>Tuần này</option>
                                                     <option value={2}>Tháng này</option>
@@ -426,7 +426,7 @@ export default function ManagementPage() {
                                                 Top 5 nhân viên bán hàng tốt nhất
                                             </div>
                                             <table className="table align-middle mb-0 bg-white ">
-                                                <thead class="bg-light">
+                                                <thead className="bg-light">
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Họ và tên</th>
