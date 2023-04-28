@@ -1,11 +1,15 @@
-import request from "../../request"
+import request from "../../request";
 
-const findCustomer = ({name,page}) => {
-    return request.get(`/api/customer?searchCode=${name}&searchName=${name}&searchPhoneNumber=${name}&page=${page ? page : '0'}`)
-}
+const findCustomer = ({ name, page }) => {
+  return request.get(
+    `/api/customer?searchCode=${name ? name : ""}&searchName=${
+      name ? name : ""
+    }&searchPhoneNumber=${name ? name : ""}&page=${page ? page : "0"}`
+  );
+};
 
 const customerForInvoiceService = {
-    findCustomer
-}
+  findCustomer,
+};
 
-export default customerForInvoiceService
+export default customerForInvoiceService;

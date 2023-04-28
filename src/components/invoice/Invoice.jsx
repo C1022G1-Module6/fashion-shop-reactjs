@@ -18,6 +18,8 @@ function Invoice() {
   const [invoice, setInvoice] = useState();
   const [customers, setCustomers] = useState([]);
   const [pageCount, setPageCount] = useState(0);
+  const [customerCode, setCustomerCode] = useState("");
+  const [discount, setDiscount] = useState(0);
   const [customerFilter, setCustomerFilter] = useState({
     name: "",
     page: 0,
@@ -30,24 +32,23 @@ function Invoice() {
   const [invoiceFilter, setInvoiceFilter] = useState({
     employeeName: "",
     total: 0,
-    payment: "",
-    bonusPoint: "",
+    payment: 0,
   });
-  const [customerCode, setCustomerCode] = useState("");
 
-  const handleTransferCustomerCode = (id,code) => {
-    const tr = document.querySelector(`.tr${id}`)
+  const handleTransferCustomerCode = (id, code) => {
+    const tr = document.querySelector(`.tr${id}`);
     if (tr.classList.contains("color")) {
-      tr.classList.remove("color")
+      tr.classList.remove("color");
     } else {
-      tr.classList.add("color")
+      tr.classList.add("color");
     }
-    setCustomerCode(code)
-  }
+    setCustomerCode(code);
+  };
 
   const resetCustomerValue = () => {
-    setCustomerCode("")
-  }
+    const customerInput = document.getElementById("customer-code".value);
+    setCustomerCode(customerInput);
+  };
 
   const handlePageClick = (event) => {
     setCustomerFilter((prev) => ({ ...prev, page: event.selected }));
@@ -59,6 +60,7 @@ function Invoice() {
       productDTO: { code: +values.productDTO },
     };
     try {
+      console.log(newValues);
       await invoiceDetailService.add(newValues);
       if (values.quantity !== "" && values.productDTO !== "") {
         setSubmitting(true);
@@ -72,7 +74,25 @@ function Invoice() {
     }
   };
 
-  const handleSubmitInvoice = () => {};
+  const handleSubmitInvoice = async (values) => {
+    let newValues = {
+      ...values,
+      total: invoiceFilter.total,
+      payment: invoiceFilter.payment,
+      bonusPoint: (invoiceFilter.payment * 10) / 500000,
+      customerDTO: { code: customerCode },
+    };
+    try {
+      console.log(newValues);
+      try {
+        await invoiceService.update(newValues)
+      } catch (error) {
+        console.warn(error);
+      }
+    } catch (error) {
+      console.warn(error);
+    }
+  };
 
   const handleTransferInfo = (deletedObject) => {
     setDeletedObject((prev) => ({ ...prev, ...deletedObject }));
@@ -102,9 +122,23 @@ function Invoice() {
       setInvoiceFilter((prev) => ({ ...prev, total: sum }));
     };
     calculateTotal();
-  }, [isSubmitting, invoiceDetails, invoiceFilter.total]);
+  }, [isSubmitting, invoiceDetails]);
 
-  // Lấy mảng
+  // Tính tiền (payment)
+  useEffect(() => {
+    if (customerCode !== "") {
+      setDiscount(customers[0].customerTypeDTO.discount);
+    }
+    const calculatePayment = () => {
+      setInvoiceFilter((prev) => ({
+        ...prev,
+        payment: invoiceFilter.total - discount,
+      }));
+    };
+    calculatePayment();
+  }, [discount, customerCode, invoiceFilter.total]);
+
+  // Lấy mảng hóa đơn chi tiết
   useEffect(() => {
     const getInvoiceDetails = async () => {
       const invoiceDetailResponse = await invoiceDetailService.findAll();
@@ -136,7 +170,7 @@ function Invoice() {
     };
   }, [showModal]);
 
-  // Lấy hóa đơn chi tiết
+  // Lấy hóa đơn
   useEffect(() => {
     const getInvoice = async () => {
       const invoiceResponse = await invoiceService.getDetail();
@@ -157,15 +191,24 @@ function Invoice() {
     getCustomers();
   }, [customerFilter]);
 
+  // Lấy giá trị của mã KH sau khi chọn
+  useEffect(() => {
+    setCustomerFilter((prev) => ({
+      ...prev,
+      name: setCustomerCode(customerCode),
+    }));
+  }, [customerCode]);
+
   return (
     <>
+      {/* {console.log("abc")} */}
       <Formik
         initialValues={{
           invoice: {
-            employeeName: invoiceFilter.employeeName,
+            employeeName: "",
             total: invoiceFilter.total,
             payment: invoiceFilter.payment,
-            bonusPoint: invoiceFilter.bonusPoint,
+            bonusPoint: (invoiceFilter.payment * 10) / 500000,
             customerDTO: "",
           },
 
@@ -176,7 +219,8 @@ function Invoice() {
           },
         }}
         onSubmit={(values) => {
-          if (values.invoice.payment === "") {
+          console.log(values);
+          if (customerCode === "") {
             handleSubmitInvoiceDetail(values.invoiceDetail);
           } else {
             handleSubmitInvoice(values.invoice);
@@ -308,10 +352,10 @@ function Invoice() {
                             <td>{invoiceDetail.productDTO.name}</td>
                             <td>{invoiceDetail.quantity}</td>
                             {/* <td>
-                                      {invoiceDetail.productDTO.productSizes.map(
-                                        (productSize) => productSize.name
-                                      )}
-                                    </td> */}
+                              {invoiceDetail.productDTO.productSizes.map(
+                                (productSize) => productSize.name
+                              )}
+                            </td> */}
                             <td>
                               {invoiceDetail.productDTO.sellingPrice.toLocaleString(
                                 "vi-VN",
@@ -349,8 +393,6 @@ function Invoice() {
                   </table>
                 </div>
               </div>
-              {/* </Form>
-              </Formik> */}
 
               <div className="mb-3 payment-info" style={{ width: "96%" }}>
                 <div className="d-flex justify-content-between">
@@ -364,11 +406,21 @@ function Invoice() {
                 </div>
                 <div className="d-flex justify-content-between">
                   <span className="fw-bold">Giảm giá: </span>
-                  <span>50.000đ</span>
+                  <span>
+                    {discount?.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </span>
                 </div>
                 <div className="d-flex justify-content-between">
                   <span className="fw-bold fs-5">Thành tiền: </span>
-                  <span className="fw-bold fs-5">150.000đ</span>
+                  <span className="fw-bold fs-5">
+                    {invoiceFilter.payment.toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </span>
                 </div>
               </div>
               <div
@@ -449,7 +501,7 @@ function Invoice() {
 
                       <button
                         className="btn btn-primary"
-                        style={{ height: "39px"}}
+                        style={{ height: "39px" }}
                         onClick={() => setShowModal(false)}
                       >
                         Chọn
@@ -469,7 +521,16 @@ function Invoice() {
                           </thead>
                           <tbody>
                             {customers.map((customer, index) => (
-                              <tr className={`tr${customer.id}`} key={index} onClick={() => handleTransferCustomerCode(customer.id,customer.code)}>
+                              <tr
+                                className={`tr${customer.id}`}
+                                key={index}
+                                onClick={() =>
+                                  handleTransferCustomerCode(
+                                    customer.id,
+                                    customer.code
+                                  )
+                                }
+                              >
                                 <td>{++index}</td>
                                 <td>{customer.code}</td>
                                 <td>{customer.name}</td>
