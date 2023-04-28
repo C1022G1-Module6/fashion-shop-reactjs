@@ -40,12 +40,10 @@ export default function ManagementPage() {
 
     const revenueWeek = async () => {
         const rw = await findRevenueInWeek();
-        console.log(rw.data);
         setRevenueList(rw.data);
     }
     const revenueMonth = async () => {
         const rm = await findRevenueInMonth();
-        console.log(rm.data);
         setRevenueList(rm.data);
     }
     const handleChange = event => {
