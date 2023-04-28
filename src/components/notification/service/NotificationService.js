@@ -38,6 +38,7 @@ export const save = async(values) =>{
 
     try {
        return await axios.post(`http://localhost:8080/notifications/create`, { ...values })
+
     } catch (error) {
         console.log(error);
     }

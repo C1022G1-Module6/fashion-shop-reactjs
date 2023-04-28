@@ -35,3 +35,7 @@
   .pagination .active .page-num {
     color: #fff;
   }
+  #page {
+      height: 100%;
+      width: 100%;
+  }

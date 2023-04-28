@@ -40,14 +40,16 @@ export default function NotificationDetailList() {
                                              style={{marginBottom: '5%'}}>
                                             <div className="mb-1 row">
 
-                                                <div className="col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                                                    <div style={{height: '100%', width: '100%'}}
+                                                <div align='center' className="col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+                                                    <div align='center' style={{height: '100%', width: '100%'}}
                                                          className="input-group input-group-merge">
-                                                        <h5 style={{marginLeft: "40%"}} className="" ><b>Nội dung chi tiết</b> </h5>
 
+                                                            <h5 style={{marginLeft: "40%"}} className="" ><b>Nội dung chi tiết</b> </h5>
+                                                        <div style={{marginTop: '5%', marginLeft: '-25%'}}>
+                                                            <h6  style= {{fontStyle: 'italic', marginTop: '5%', }}>{detail?.content}</h6>
+
+                                                        </div>
                                                     </div>
-                                                    <p style= {{fontStyle: 'italic'}}>-{detail?.content}</p>
-
                                                 </div>
                                             </div>
                                         </div>
