@@ -13,8 +13,23 @@ const changePassword = (value)=>{
     })
 }
 
+const forgotPassword = (value)=>{
+    return request.post('/forgot-password', { ...value })
+}
+
+const checkOtp = (value)=>{
+    return request.put('/check-otp', { ...value } )
+}
+
+const resetPassword = (value)=>{
+    return request.put('/reset-password',{ ...value })
+}
+
 const loginService = {
     login,
-    changePassword
+    changePassword,
+    forgotPassword,
+    checkOtp,
+    resetPassword
 }
 export default loginService

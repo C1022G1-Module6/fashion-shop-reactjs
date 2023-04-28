@@ -1,0 +1,41 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .gradient-custom-2 {
+    background: #fccb90;
+    /* background: -webkit-linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593); */
+    background: url('https://us.123rf.com/450wm/cattallina/cattallina1711/cattallina171100017/90225697-elegant-woman-wearing-wide-brimmed-hat-design-black-and-white-vector-portrait-of-a-beautiful-girl.jpg?ver=6');
+    background-size: cover;
+  }
+  
+  .bg-forgot-password:hover {
+    color: rgb(190, 182, 182) !important;
+  }
+  
+  .button1 {
+    background: linear-gradient(to right, #e7e4e2, #b9b8b6, #969593, #5e5d5bd7);
+    color: black;
+  }
+  
+  .button1:hover {
+    color: rgb(190, 182, 182)
+  }
+  
+  @media (min-width: 768px) {
+    .gradient-form {
+        height: 100vh !important;
+    }
+  }
+  
+  @media (min-width: 769px) {
+    .gradient-custom-2 {
+        border-top-right-radius: .3rem;
+        border-bottom-right-radius: .3rem;
+    }
+  }
+  .link-dark:hover{
+    background-color: #183661 !important;
+    color: white;
+  }

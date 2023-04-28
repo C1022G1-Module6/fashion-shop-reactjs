@@ -1,8 +1,9 @@
 
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import Login from './components/Login';
-import EmployeeDetail from './components/EmployeeDetail';
+import Login from './components/login/Login';
+import EmployeeDetail from './components/login/EmployeeDetail';
+
 
 function App() {
   return (
