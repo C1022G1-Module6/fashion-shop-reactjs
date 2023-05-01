@@ -10,7 +10,8 @@ import Notification from './components/notification/Notification';
 import NotificationCreate from './components/notification/NotificationCreate';
 import NotificationDetailList from './components/notification/NotificationDetailList';
 import Invoice from './components/invoice/Invoice';
-
+import Statistics from './components/statistics/statistics';
+import DataEntry from './components/data_entry/dataEntry'
 
 function App() {
   return (
@@ -20,9 +21,9 @@ function App() {
       <Route path='/notifications' element={<Notification />} />
       <Route path='/notifications/detail/:id' element={<NotificationDetailList />} />
       <Route path='/notifications/create' element={<NotificationCreate />} />
-    <Route path='/invoice' element={<Invoice />} />
-
-
+      <Route path='/invoice' element={<Invoice />} />
+      <Route path="/statistics" element={<Statistics />} />
+      <Route path="/data-entry" element={<DataEntry />} />
       <Route path='/employee' element={<EmployeeDetail />} />
     </Routes>
     </>
