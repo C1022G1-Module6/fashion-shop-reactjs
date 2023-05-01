@@ -20,7 +20,7 @@ export default function Login() {
     const handleShowFromEmail = () => {
         setShowFormEmail(true)
     }
-    const handleHideEmail = () => {
+    const handleHideEmail = () => { 
         setShowFormEmail(false)
     }
     const handleHideOtp = () => {
