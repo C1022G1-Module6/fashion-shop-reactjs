@@ -3,14 +3,14 @@
     padding: 0;
     box-sizing: border-box;
   }
-  .gradient-custom-2 {
-    background: #fccb90;
+  .gradientCustom2 {
+    /* background: #fccb90; */
     /* background: -webkit-linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593); */
-    background: url('https://lavenderstudio.com.vn/wp-content/uploads/2019/07/chup-anh-cua-hang-thoi-trang-2-1024x683.png');
+    background:  url('https://i.fbcd.co/products/original/f4f874ac00896351cd325bff5930570ee54a031f7422352febe1fadeedafef5f.jpg');
     background-size: cover;
   }
   
-  .bg-forgot-password:hover {
+  .bgForgotPassword:hover {
     color: rgb(190, 182, 182) !important;
   }
   
@@ -24,19 +24,18 @@
   }
   
   @media (min-width: 768px) {
-    .gradient-form {
+    .gradientForm {
         height: 100vh !important;
     }
   }
   
   @media (min-width: 769px) {
-    .gradient-custom-2 {
+    .gradientCustom2 {
         border-top-right-radius: .3rem;
         border-bottom-right-radius: .3rem;
     }
   }
-  .link-dark:hover{
+  .linkDark:hover{
     background-color: #183661 !important;
     color: white;
   }
-  
