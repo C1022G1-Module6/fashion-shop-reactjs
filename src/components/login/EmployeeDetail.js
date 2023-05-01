@@ -18,7 +18,6 @@ export default function EmployeeDetail() {
     useEffect(() => {
         employeeDetail()
     }, [])
-
     const handleLogout = () => {
         localStorage.removeItem('token')
         navigate('/')
@@ -122,6 +121,10 @@ export default function EmployeeDetail() {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
+                                                <tr className="fs-5">
+                                                        <th>Vị trí : </th>
+                                                        <td style={{ height: 50 }}>{detail?.roleDTOSetSet[0].name === 'ROLE_SALER' ? 'Nhân viên bán hàng' : detail?.roleDTOSetSet[0].name==='ROLE_WAREHOUSE_MANAGER' ? 'Quản lý kho hàng' : 'Quản lý cửa hàng'}</td>
+                                                    </tr>
                                                     <tr className="fs-5">
                                                         <th style={{ width: 250 }}>Giới tính : </th>
                                                         <td style={{ height: 50 }}>{detail?.gender === false ? 'Nam' : 'Nữ'}</td>
