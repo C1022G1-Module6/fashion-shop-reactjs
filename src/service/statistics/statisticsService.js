@@ -11,7 +11,7 @@ export const listAll = ({month}) => {
 export const monthRevenue = ({month}) => {
     console.log(month);
     try {
-        return request.get(`/statistics/month-revenue?month=${month}`);
+        return request.get(`/statistics/month-revenue?month=${month ? month : ''}`);
     } catch(error){
         console.log(error);
     }

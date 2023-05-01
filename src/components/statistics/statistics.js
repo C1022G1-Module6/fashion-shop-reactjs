@@ -1,3 +1,4 @@
+import styles from "../data-entry/dataEntry.module.css";
 import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 import { useEffect, useState } from "react";
@@ -7,23 +8,27 @@ import { monthRevenue } from "../../service/statistics/statisticsService";
 import { Field, Form, Formik } from "formik";
 Chart.register(CategoryScale);
 
+
 function Statistics() {
   const [statistics, setStatistics] = useState([]);
 
-  const [monthRevenues, setMonthRevenues] = useState([]);
+  const [monthRevenues, setMonthRevenues] = useState('');
 
+  const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+  const [getMonth, setGetMonth] = useState('');
   const getStatistics = async () => {
     const statisticsData = await listAll("");
     setStatistics(statisticsData.data);
-    console.log(statisticsData.data);
+
   };
 
   const getMonthRevenues = async () => {
     const monthRevenuesData = await monthRevenue("");
     setMonthRevenues(monthRevenuesData.data);
-    console.log(monthRevenuesData.data);
-  };
 
+  };
+  
   const chartData = {
     labels: statistics.map((statistic) =>{
      return "Ngày " + statistic.day
@@ -54,16 +59,12 @@ function Statistics() {
     getMonthRevenues();
   }, []);
 
-  const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
-  const [getMonth, setGetMonth] = useState("");
-
   return (
     <>
       <div className="container-fluid p-0">
         <div className="row p-0 m-0">
           <div className="col-sm-12 col-lg-12 col-md-12 p-0">
-            <legend class="fw-bolder text-center heading mb-3">
+            <legend class={`${styles.heading} fw-bolder text-center mb-3`}>
               THỐNG KÊ THU NHẬP THÁNG {getMonth}
             </legend>
           </div>
@@ -73,14 +74,14 @@ function Statistics() {
                 month: "",
               }}
               onSubmit={(value) => {
+                setGetMonth(value.month);
                 const getStatistics = async () => {
                   const statisticsData = await listAll(value);
                   const monthRevenuesData = await monthRevenue(value);
                   console.log(statisticsData.data.filter((a) => a.revenue));
                   setStatistics(statisticsData.data);
                   setMonthRevenues(monthRevenuesData.data[0].totalRevenue);
-
-                  setGetMonth(value.month);
+                  console.log(getMonth)
                 };
                 getStatistics();
               }}
@@ -115,7 +116,7 @@ function Statistics() {
                     style={{ backgroundColor: "#93D9D9", width: "500px" }}
                     className="text-center pt-2 pb-2"
                   >
-                    Tổng doang thu tháng {getMonth} { monthRevenues!='' && <span> : {monthRevenues} VNĐ</span>}
+                    Tổng doanh thu tháng  { statistics.length!==0 ? <span> {getMonth} : {monthRevenues} VNĐ</span>  : <span> {getMonth} : 0 VNĐ</span>}
                   </h5>
                 </div>
                 <div className="text-center">

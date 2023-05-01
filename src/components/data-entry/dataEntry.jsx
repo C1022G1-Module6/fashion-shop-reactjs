@@ -4,35 +4,33 @@ import { useState } from "react";
 import { Field, Form, Formik } from "formik";
 import dataEntryProductService from "../../service/data_entry/dataEntryProductService";
 import dataEntryService from "../../service/data_entry/dataEntryService";
-import "./dataEntry.css";
 import ModalDeleteInvoice from "../../util/invoice/ModalDeleteInvoice";
 import Swal from "sweetalert2";
-import * as Yup from "yup";
+import styles from "./dataEntry.module.css";
 
 function DataEntry() {
   const [dataEntryProducts, setDataEntryProducts] = useState([]);
   const [isSubmitting, setSubmitting] = useState(false);
   const [dataEntry, setDataEntry] = useState();
   const [flag, setFlag] = useState(false);
-  const [productCode, setProductCode] = useState("")
-  const [productQuantity, setProductQuantity] = useState("")
+  const [productCode, setProductCode] = useState("");
+  const [productQuantity, setProductQuantity] = useState("");
   const [deletedObject, setDeletedObject] = useState({
     deletedId: "",
     deletedName: "",
   });
 
   const cancel = async () => {
-    dataEntryService.remove()
-    resetValues()
-  }
+    dataEntryService.remove();
+    resetValues();
+  };
   const setValueOfProductCode = (e) => {
-    
     console.log(e.target.value);
-    setProductCode(e.target.value)
-  }
+    setProductCode(e.target.value);
+  };
   const setValueOfProductQuantity = (e) => {
-    setProductQuantity(e.target.value)
-  }
+    setProductQuantity(e.target.value);
+  };
   const handleTransferInfo = (deletedObject) => {
     setDeletedObject((prev) => ({ ...prev, ...deletedObject }));
   };
@@ -52,8 +50,8 @@ function DataEntry() {
   const resetValues = () => {
     setDataEntry({});
     setDataEntryProducts([]);
-    setProductCode("")
-    setProductQuantity("")
+    setProductCode("");
+    setProductQuantity("");
   };
 
   const handleChangeFlag = () => {
@@ -130,13 +128,12 @@ function DataEntry() {
             employeeName: "",
           },
         }}
-        validationSchema={Yup.object({
-          name: Yup.string().required("Required."),
-          email: Yup.string().required("Required.").email("abc@gmail.com"),
-          phone: Yup.string()
-            .required("Required."),
-          message: Yup.string().required("Required."),
-        })}
+        // validationSchema={Yup.object({
+        //   name: Yup.string().required("Required."),
+        //   email: Yup.string().required("Required.").email("abc@gmail.com"),
+        //   phone: Yup.string().required("Required."),
+        //   message: Yup.string().required("Required."),
+        // })}
         onSubmit={(values) => {
           if (!flag) {
             handleSubmitDataEntryProduct(values.dataEntryProduct);
@@ -145,51 +142,53 @@ function DataEntry() {
           }
         }}
       >
-        <Form name="dataEntry" className="mt-5">
-          <div className="container col-12 col-md-10 col-lg-8 col-xxl-6">
-            <div className="content row">
+        <Form className="mt-5">
+          <div
+            className={`${styles.wrapper} container col-12 col-md-10 col-lg-8 col-xxl-6`}
+          >
+            <div className={`${styles.content} row `}>
               <div className="mb-3 text-center row">
-                <h2 className="heading">NHẬP LIỆU</h2>
+                <h2 className={styles.heading}>NHẬP LIỆU</h2>
               </div>
-              <div className="row mb-3 input-search p-0">
-                <div className="col-5 d-flex justify-content-between">
+              <div className="row mb-3 p-0">
+                <div className="col-5">
                   <label htmlFor="" className="fw-bold">
-                    Mã phiếu nhập<span className="colon">:</span>
+                    Mã phiếu nhập <span className={styles.colon}>:</span>
                   </label>
-                  {isSubmitting ? <span>{dataEntry.code}</span> : <span></span>}
+                  {isSubmitting ? <span> {dataEntry.code}</span> : <span></span>}
                 </div>
                 <div className="col-2" />
-                <div className="col-5 d-flex justify-content-between">
+                <div className="col-5">
                   <label htmlFor="" className="fw-bold">
-                    Ngày tháng năm<span className="colon">:</span>{" "}
+                    Ngày tháng năm <span className={styles.colon}>:</span>{" "}
                   </label>
-                  {isSubmitting ? <span>{dataEntry.date}</span> : <span></span>}
+                  {isSubmitting ? <span> {dataEntry.date}</span> : <span></span>}
                 </div>
               </div>
               <div className="row">
                 <fieldset className="border border-secondary p-2 mb-3 w-100">
                   <legend className="float-none w-auto p-2 fs-5 fw-bold">
-                    Thông tin hàng hóa<span className="colon">:</span>
+                    Thông tin nhập liệu<span className={styles.colon}>:</span>
                   </legend>
-                  <div className="row mb-3 input-search">
+                  <div className={`${styles["input-search"]} row mb-3`}>
                     <label
                       htmlFor="product-code"
                       className="col-4 col-lg-3 fw-bold"
                     >
                       Mã hàng<span className="text-danger">*</span>{" "}
-                      <span className="colon">:</span>{" "}
+                      <span className={styles.colon}>:</span>{" "}
                     </label>
                     <Field
                       type="text"
-                      className="col-6 col-lg-8 input_field me-3"
+                      className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
                       placeholder="Mã hàng"
                       id="product-code"
                       name="dataEntryProduct.productDTO"
                       value={productCode}
-                      onChange={(e)=>setValueOfProductCode(e)}
+                      onChange={(e) => setValueOfProductCode(e)}
                     />
                   </div>
-                  <div className="row mb-3 input-search">
+                  <div className={`${styles["input-search"]} row mb-3`}>
                     <label
                       htmlFor="product-quantity"
                       className="col-4 col-lg-3 fw-bold"
@@ -199,18 +198,18 @@ function DataEntry() {
                     </label>
                     <Field
                       type="number"
-                      className="col-6 col-lg-8 input_field me-3"
+                      className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
                       placeholder="Số lượng"
                       id="productuantity"
                       name="dataEntryProduct.quantity"
                       value={productQuantity}
-                      onChange={(e)=>setValueOfProductQuantity(e)}
+                      onChange={(e) => setValueOfProductQuantity(e)}
                     />
                   </div>
                   <div className="row d-flex justify-content-center">
                     <button
                       type="submit"
-                      className="btn btn-primary"
+                      className="btn btn-outline-primary"
                       style={{ width: "150px" }}
                     >
                       Ghi thông tin
@@ -279,9 +278,13 @@ function DataEntry() {
               </div>
               <div
                 className="d-flex justify-content-center"
-                style={{ width: "96%", gap: "100px" }}
+                style={{ width: "96%", gap: "50px" }}
               >
-                <button type="button" className="btn btn-secondary" onClick={cancel}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={cancel}
+                >
                   <i className="bi bi-x-circle"></i>
                   Huỷ
                 </button>
