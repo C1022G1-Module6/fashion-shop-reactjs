@@ -9,7 +9,7 @@ const findCustomer = ({ name, page }) => {
 };
 
 const customerForInvoiceService = {
-  findCustomer,
+  findCustomer
 };
 
 export default customerForInvoiceService;

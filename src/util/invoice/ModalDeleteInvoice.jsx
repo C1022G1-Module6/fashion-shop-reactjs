@@ -12,13 +12,13 @@ function ModalDeleteInvoice(props) {
       >
         <div className="modal-dialog">
           <div className="modal-content">
-            <div className="modal-header">
+            <div className="modal-header" style={{backgroundColor: '#183661', color: 'white'}}>
               <h5 className="modal-title" id="exampleModalLabel">
                 Xóa sản phẩm
               </h5>
               <button
                 type="button"
-                className="btn-close"
+                className="btn-close" style={{background: 'none'}}
                 data-bs-dismiss="modal"
                 aria-label="Close"
               >

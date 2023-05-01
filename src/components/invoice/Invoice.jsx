@@ -2,14 +2,18 @@ import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import ModalDeleteInvoice from "../../util/invoice/ModalDeleteInvoice";
-import "./invoice.css";
+import styles from "./invoice.module.css";
 import "./media_query.css";
 import { useRef } from "react";
-import { Field, Form, Formik } from "formik";
+import { Field, Form, Formik, ErrorMessage } from "formik";
 import invoiceDetailService from "../../service/invoice/invoiceDetailService";
 import invoiceService from "../../service/invoice/invoiceService";
 import customerForInvoiceService from "../../service/customer/customerForInvoiceService";
 import ReactPaginate from "react-paginate";
+import Swal from "sweetalert2";
+import InvoicePDF from "./InvoicePDF";
+import { useReactToPrint } from "react-to-print";
+import * as Yup from "yup";
 
 function Invoice() {
   const [showModal, setShowModal] = useState(false);
@@ -24,7 +28,6 @@ function Invoice() {
     name: "",
     page: 0,
   });
-  const modalContainer = useRef();
   const [deletedObject, setDeletedObject] = useState({
     deletedId: "",
     deletedName: "",
@@ -34,35 +37,92 @@ function Invoice() {
     total: 0,
     payment: 0,
   });
+  const [filename, setFileName] = useState("");
+
+  const modalContainer = useRef();
+  const componentBRef = useRef(null);
+  const swalWithBootstrapButtons = Swal.mixin({});
+
+  const getFileNameWithoutExtension = (file) => {
+    const fileNameWithoutExtension = file.substring(0, file.lastIndexOf("."));
+    return fileNameWithoutExtension;
+  };
+
+  const handleFileSelect = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      const fileName = selectedFile.name;
+      const file = getFileNameWithoutExtension(fileName);
+      if (fileName.endsWith(".png")) {
+        setFileName(file);
+      } else {
+        console.log("Please select a PNG file");
+      }
+    }
+  };
+
+  const setProductValue = (e) => {
+    setFileName(e.target.value);
+  };
+
+  const resetValue = () => {
+    setInvoiceDetails([]);
+    setInvoice({});
+    setCustomerCode("");
+    setDiscount(0);
+    setFileName("");
+  };
+
+  const handlePrint = useReactToPrint({
+    content: () => componentBRef.current,
+    pageStyle: "@page { size: A4; margin: 0; }",
+  });
 
   const handleTransferCustomerCode = (id, code) => {
     const tr = document.querySelector(`.tr${id}`);
     if (tr.classList.contains("color")) {
       tr.classList.remove("color");
+      setCustomerCode("");
+      setDiscount(0);
     } else {
       tr.classList.add("color");
+      setCustomerCode(code);
     }
-    setCustomerCode(code);
   };
 
-  const resetCustomerValue = () => {
-    const customerInput = document.getElementById("customer-code".value);
-    setCustomerCode(customerInput);
+  const resetCustomerValue = (e) => {
+    setCustomerCode(e.target.value);
   };
 
   const handlePageClick = (event) => {
     setCustomerFilter((prev) => ({ ...prev, page: event.selected }));
   };
 
+  const handleTransferInfoToModal = () => {
+    let newValues = {
+      ...invoice,
+      total: invoiceFilter.total,
+      discount: discount,
+      payment: invoiceFilter.payment,
+      customerDTO: { code: customerCode },
+    };
+    setInvoice(newValues);
+  };
+
+  const handleResetInvoice = () => {
+    invoiceService.remove();
+    resetValue();
+  };
+
   const handleSubmitInvoiceDetail = async (values) => {
+    debugger
     let newValues = {
       ...values,
-      productDTO: { code: +values.productDTO },
+      productDTO: { code: filename },
     };
     try {
-      console.log(newValues);
       await invoiceDetailService.add(newValues);
-      if (values.quantity !== "" && values.productDTO !== "") {
+      if (values.quantity !== "") {
         setSubmitting(true);
       }
       if (isSubmitting) {
@@ -70,26 +130,25 @@ function Invoice() {
         setSubmitting(newIsSubmitting);
       }
     } catch (error) {
+      const errorQuantity = document.getElementById("error-quantity");
+      errorQuantity.style.display = "block";
       console.warn(error);
     }
   };
 
-  const handleSubmitInvoice = async (values) => {
-    let newValues = {
-      ...values,
-      total: invoiceFilter.total,
-      payment: invoiceFilter.payment,
-      bonusPoint: (invoiceFilter.payment * 10) / 500000,
-      customerDTO: { code: customerCode },
-    };
+  const handleSubmitInvoice = async () => {
     try {
-      console.log(newValues);
-      try {
-        await invoiceService.update(newValues)
-      } catch (error) {
-        console.warn(error);
-      }
+      await invoiceService.update(invoice);
+      handlePrint();
+      Swal.fire({
+        icon: "success",
+        title: "In thành công",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      resetValue();
     } catch (error) {
+      swalWithBootstrapButtons.fire("Hủy", "Lỗi in :)", "error");
       console.warn(error);
     }
   };
@@ -204,66 +263,60 @@ function Invoice() {
       {/* {console.log("abc")} */}
       <Formik
         initialValues={{
-          invoice: {
-            employeeName: "",
-            total: invoiceFilter.total,
-            payment: invoiceFilter.payment,
-            bonusPoint: (invoiceFilter.payment * 10) / 500000,
-            customerDTO: "",
-          },
-
           invoiceDetail: {
             quantity: "",
             delete: false,
             productDTO: "",
           },
         }}
+        // validationSchema={Yup.object({
+        //   customerCode: Yup.string().required("Trường này yêu cầu nhập"),
+        //   productDTO: Yup.string().required("Trường này yêu cầu nhập"),
+        //   quantity: Yup.string()
+        //     .required("Trường này yêu cầu nhập")
+        //     .matches("^[1-9][\\d]*$", "Số lượng sách phải là số nguyên dương"),
+        // })}
         onSubmit={(values) => {
-          console.log(values);
-          if (customerCode === "") {
-            handleSubmitInvoiceDetail(values.invoiceDetail);
-          } else {
-            handleSubmitInvoice(values.invoice);
-          }
+          handleSubmitInvoiceDetail(values.invoiceDetail);
         }}
       >
-        <Form name="invoice">
-          <div className="container col-12 col-md-10 col-lg-8 col-xxl-6">
-            <div className="content row">
+        <Form>
+          <div className={`${styles.wrapper} container col-12 col-md-10 col-lg-8 col-xxl-6`}>
+            <div className={`${styles.content} row`}>
               <div className="mb-3 text-center row">
-                <h2 className="heading">THANH TOÁN</h2>
+                <h2 className={styles.heading}>THANH TOÁN</h2>
               </div>
-              <div className="row mb-3 input-search p-0">
+              <div className= {`${styles['input-search']} row mb-3 p-0`}>
                 <div className="d-flex justify-content-between">
                   <label htmlFor="" className="fw-bold">
-                    Mã hóa đơn<span className="colon">:</span>
+                    Mã hóa đơn<span className={styles.colon}>:</span>
                   </label>
                   {isSubmitting ? <span>{invoice.code}</span> : <span></span>}
                 </div>
               </div>
-              <div className="row mb-3 input-search p-0">
+              <div className={`${styles['input-search']}row mb-3 p-0`}>
                 <div className="d-flex justify-content-between">
                   <label htmlFor="" className="fw-bold">
-                    Ngày tháng năm<span className="colon">:</span>{" "}
+                    Ngày tháng năm<span className={styles.colon}>:</span>{" "}
                   </label>
                   {isSubmitting ? <span>{invoice.date}</span> : <span></span>}
                 </div>
               </div>
-              <div className="row mb-3 input-search p-0">
+              <div className={`${styles['input-search']} row p-0`}>
                 <div className="d-flex justify-content-between">
                   <label htmlFor="customer-code" className="fw-bold">
                     Mã khách hàng<span className="text-danger">*</span>{" "}
-                    <span className="colon">:</span>{" "}
+                    <span className={styles.colon}>:</span>{" "}
                   </label>
                   <Field
                     type="text"
-                    className="customer-input input_field me-3"
+                    className={`${styles['customer-input']} ${styles['input_field']} me-3`}
                     style={{ marginLeft: 8 }}
                     placeholder="Mã khách hàng"
                     id="customer-code"
-                    name="invoice.customerDTO"
+                    name="customerCode"
                     value={customerCode}
-                    onChange={() => resetCustomerValue()}
+                    onChange={(e) => resetCustomerValue(e)}
                   />
                   <button
                     type="button"
@@ -277,41 +330,66 @@ function Invoice() {
                   </button>
                 </div>
               </div>
+              <ErrorMessage
+                component="div"
+                className="text-danger d-flex justify-content-center"
+                name="customerCode"
+              />
               <div className="row">
                 <fieldset className="border border-secondary p-2 mb-3 w-100">
                   <legend className="float-none w-auto p-2 fs-5 fw-bold">
-                    Thông tin hàng hóa<span className="colon">:</span>
+                    Thông tin hàng hóa<span className={styles.colon}>:</span>
                   </legend>
-                  <div className="row mb-3 input-search">
+                  <div className={`row mb-3 ${styles['input-search']}`}>
                     <label
                       htmlFor="product-code"
                       className="col-4 col-lg-3 fw-bold"
                     >
                       Mã hàng<span className="text-danger">*</span>{" "}
-                      <span className="colon">:</span>{" "}
+                      <span className={styles.colon}>:</span>{" "}
                     </label>
                     <Field
                       type="text"
-                      className="col-6 col-lg-8 input_field me-3"
+                      className={`${styles['input_field']} col-6 col-lg-8 me-3`}
                       placeholder="Mã hàng"
                       id="product-code"
                       name="invoiceDetail.productDTO"
+                      value={filename}
+                      onChange={(e) => setProductValue(e)}
+                    />
+                    <ErrorMessage
+                      component="div"
+                      className="text-danger"
+                      name="productDTO"
                     />
                   </div>
-                  <div className="row mb-3 input-search">
+                  <div className={`row mb-3 ${styles['input-search']}`}>
                     <label
                       htmlFor="product-quantity"
                       className="col-4 col-lg-3 fw-bold"
                     >
                       Số lượng<span className="text-danger">*</span>{" "}
-                      <span className="colon">:</span>{" "}
+                      <span className={styles.colon}>:</span>{" "}
+                      <span
+                        id="error-quantity"
+                        className="text-danger"
+                        style={{ display: "none" }}
+                      >
+                        Mặt hàng này hiện số lượng không đủ yêu cầu của khách
+                        hàng
+                      </span>
                     </label>
                     <Field
                       type="number"
-                      className="col-6 col-lg-8 input_field me-3"
+                      className={`${styles['input_field']} col-6 col-lg-8 me-3`}
                       placeholder="Số lượng"
                       id="product-quantity"
                       name="invoiceDetail.quantity"
+                    />
+                    <ErrorMessage
+                      component="div"
+                      className="text-danger"
+                      name="quantity"
                     />
                   </div>
                   <div className="row">
@@ -394,7 +472,7 @@ function Invoice() {
                 </div>
               </div>
 
-              <div className="mb-3 payment-info" style={{ width: "96%" }}>
+              <div className={`${styles['payment-info']} mb-3`} style={{ width: "96%" }}>
                 <div className="d-flex justify-content-between">
                   <span className="fw-bold">Tổng: </span>
                   <span>
@@ -436,12 +514,30 @@ function Invoice() {
                       style={{ cursor: "pointer" }}
                     />
                   </label>
-                  <input type="file" id="qr-file" className="d-none" />
+                  <input
+                    type="file"
+                    id="qr-file"
+                    className="d-none"
+                    onChange={handleFileSelect}
+                  />
                 </div>
-                <button type="submit" className="btn btn-outline-primary">
+                <button
+                  type="button"
+                  className="btn btn-outline-primary button"
+                  style={{ backgroundColor: "none" }}
+                  data-bs-toggle="modal"
+                  data-bs-target="#exampleModal1"
+                  onClick={() => handleTransferInfoToModal()}
+                >
                   <i className="bi bi-printer-fill" /> In hóa đơn
                 </button>
-                <button className="btn btn-outline-secondary">Hủy</button>
+                <button
+                  type="button"
+                  onClick={() => handleResetInvoice()}
+                  className="btn btn-outline-secondary"
+                >
+                  Hủy
+                </button>
               </div>
             </div>
           </div>
@@ -450,23 +546,23 @@ function Invoice() {
 
       {/* modal-customer-search */}
       {showModal && (
-        <div className="modal-custom">
+        <div className={styles['modal-custom']}>
           <div
-            className="modal-container"
+            className={styles['modal-container']}
             style={{ width: "50%" }}
             ref={modalContainer}
           >
-            <div className="modal-close" onClick={() => setShowModal(false)}>
+            <div className={styles['modal-close']} onClick={() => setShowModal(false)}>
               <i className="bi bi-x-lg"></i>
             </div>
             <div className="text-center">
-              <h2 className="heading" style={{ margin: 0 }}>
+              <h2 className={styles.heading} style={{ margin: 0 }}>
                 TRA CỨU KHÁCH HÀNG
               </h2>
             </div>
-            <div className="modal-body">
+            <div className={styles['modal-body']}>
               <div className="container" style={{ boxShadow: "none" }}>
-                <div className="content row">
+                <div className={`${styles.content} row`}>
                   <div className="col-12">
                     <div className="d-flex justify-content-between">
                       <Formik
@@ -480,10 +576,10 @@ function Invoice() {
                         }}
                       >
                         <Form>
-                          <div className="mb-3 input-search d-flex justify-content-between">
+                          <div className={`${styles['input-search']} mb-3 d-flex justify-content-between`}>
                             <Field
                               type="text"
-                              className="customer-info-input input_field"
+                              className={`${styles['customer-info-input']} ${styles['input_field']}`}
                               placeholder="Nhập mã KH, tên KH hoặc SĐT"
                               name="name"
                             />
@@ -549,7 +645,7 @@ function Invoice() {
                         onPageChange={handlePageClick}
                         pageCount={pageCount}
                         previousLabel="Trước"
-                        containerClassName="pagination"
+                        containerClassName={styles.pagination}
                         pageClassName="page-item"
                         pageLinkClassName="page-link"
                         nextClassName="page-item"
@@ -567,10 +663,42 @@ function Invoice() {
           </div>
         </div>
       )}
+
       <ModalDeleteInvoice
         deletedName={deletedObject.deletedName}
         onCompletedDelete={handleDelete}
       />
+
+      {/* {modal-print} */}
+      <div className="modal fade" id="exampleModal1">
+        <div className="modal-dialog" style={{ maxWidth: "800px" }}>
+          <div className="modal-content">
+            <div className="modal-body p-0">
+              <div ref={componentBRef}>
+                <InvoicePDF invoice={invoice} invoiceDetails={invoiceDetails} />
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                data-bs-dismiss="modal"
+              >
+                Close
+              </button>
+              <div>
+                <button
+                  className="btn btn-outline-primary"
+                  data-bs-dismiss="modal"
+                  onClick={() => handleSubmitInvoice()}
+                >
+                  Xác nhận in hóa đơn
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

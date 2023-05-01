@@ -1,5 +1,4 @@
 body {
-  /* height: 100vh; */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,12 +9,18 @@ body {
   color: #ffff
 }
 
-.container {
+.wrapper {
   box-shadow: 8px 8px 16px 8px rgba(0, 0, 0, 0.2);
 }
 
 .content {
   padding: 30px;
+}
+
+.b {
+  width: 100%;
+  height: 100%;
+  font-size: 25px;
 }
 
 .heading {
@@ -66,22 +71,6 @@ th {
   text-align: center;
   border: 1px solid black;
   animation: modalFadeIn ease 0.4s;
-}
-
-.modal-header {
-  background-color: #183661;
-  color: white;
-}
-
-.btn-close {
-  background: none;
-}
-
-.modal-custom-header {
-  padding: 16px 0;
-  background-color: #183661;
-  color: white;
-  font-size: 30px;
 }
 
 .modal-close {
@@ -146,31 +135,86 @@ th {
   gap: 5px;
   margin-top: 20px;
 }
-.pagination .page-num,
-.pagination .page-previous,
-.pagination .page-next {
-  padding: 8px 15px;
-  cursor: pointer;
-  border-radius: 3px;
-  font-weight: 400;
-  display: block;
+
+@media (max-width: 768px) {
+  .qr {
+    width: 12%;
+  }
+  .colon {
+    display: none;
+  }
 }
 
-/* .pagination .page-num:hover,
-.pagination .page-previous,
-.pagination .page-next {
-  background-color: #0b5ed7;
-  color: white;
+@media (max-width: 576px) {
+  .customer-input {
+    width: 40%;
+  }
 }
 
-.pagination a {
-  text-decoration: none;
+@media (max-width: 900px) {
+  .modal-container {
+    width: 80% !important;
+  }
 }
 
-.pagination .active {
-  background-color: #0b5ed7;
+@media (min-width: 1294px) and (max-width: 1495px) {
+  .customer-info-input {
+    width: 400px;
+  }
 }
 
-.pagination .active .page-num {
-  color: #fff;
-} */
+@media (min-width: 1195px) and (max-width: 1293px) {
+  .customer-info-input {
+    width: 350px;
+  }
+}
+
+@media (min-width: 1094px) and (max-width: 1194px) {
+  .customer-info-input {
+    width: 300px;
+  }
+}
+
+@media (min-width: 994px) and (max-width: 1093px) {
+  .customer-info-input {
+    width: 250px;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 993px) {
+  .customer-info-input {
+    width: 200px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 899px) {
+  .customer-info-input {
+    width: 350px;
+  }
+}
+
+@media (min-width: 564px) and (max-width: 767px) {
+  .customer-info-input {
+    width: 250px;
+  }
+}
+
+@media (max-width: 564px) {
+  .customer-info-input {
+    width: 140px;
+  }
+}
+
+@media print {
+  body {
+    zoom: 0.75; /* Giảm tỷ lệ in để tránh vỡ form */
+  }
+  .container,
+  .table-responsive {
+    width: 100% !important;
+  }
+  .payment-info {
+    width: 100% !important;
+    margin-right: 0 !important;
+  }
+}

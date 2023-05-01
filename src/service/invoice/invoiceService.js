@@ -12,10 +12,15 @@ const getDetail = () => {
     return request.get(`/invoice/detail`)
 }
 
+const remove = () => {
+    return request.delete(`/invoice`)
+}
+
 const invoiceService = {
     findAll,
     update,
-    getDetail
+    getDetail,
+    remove
 };
 
 export default invoiceService;
