@@ -12,10 +12,15 @@ const getDetail = () => {
     return request.get(`/data-entry/detail`);
 };
 
+const remove = () => {
+    return request.delete(`/data-entry`)
+}
+
 const dataEntryService = {
     findAll,
     update,
-    getDetail
+    getDetail,
+    remove
 };
 
 export default dataEntryService;

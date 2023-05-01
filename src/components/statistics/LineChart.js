@@ -12,14 +12,21 @@ function LineChart({ chartData }) {
           plugins: {
             title: {
               display: true,
-              text: "Doanh thu năm 2023",
               width: "50px"
             },
             layout: {
               display: true,
               width: "1000px"
+            },
+          },
+          scales: {
+            y: {
+              title: {
+                display: true,
+                text: 'VNĐ'
+              },
             }
-          }
+          },
         }}
       />
     </div>

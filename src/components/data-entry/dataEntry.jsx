@@ -1,89 +1,165 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-// import { useRef } from "react";
 import { Field, Form, Formik } from "formik";
 import dataEntryProductService from "../../service/data_entry/dataEntryProductService";
 import dataEntryService from "../../service/data_entry/dataEntryService";
+import "./dataEntry.css";
+import ModalDeleteInvoice from "../../util/invoice/ModalDeleteInvoice";
+import Swal from "sweetalert2";
+import * as Yup from "yup";
 
-function DataEntry(){
-    const [dataEntryProducts, setDataEntryProducts] = useState([]);
-    const [isSubmitting, setSubmitting] = useState(false);
-    const [dataEntry, setDataEntry] = useState();
+function DataEntry() {
+  const [dataEntryProducts, setDataEntryProducts] = useState([]);
+  const [isSubmitting, setSubmitting] = useState(false);
+  const [dataEntry, setDataEntry] = useState();
+  const [flag, setFlag] = useState(false);
+  const [productCode, setProductCode] = useState("")
+  const [productQuantity, setProductQuantity] = useState("")
+  const [deletedObject, setDeletedObject] = useState({
+    deletedId: "",
+    deletedName: "",
+  });
 
-    const handleSubmitDataEntryProduct = async (values) => {
-        let newValues = {
-          ...values,
-          productDTO: { code: +values.productDTO },
-        };
-        console.log(newValues);
-        try {
-          await dataEntryProductService.add(newValues);
-          if (values.quantity !== "" && values.productDTO !== "") {
-            setSubmitting(true);
-          }
-          if (isSubmitting) {
-            const newIsSubmitting = { ...isSubmitting };
-            setSubmitting(newIsSubmitting);
-          }
-        } catch (error) {
-          console.log(error);
-        }
-      };
+  const cancel = async () => {
+    dataEntryService.remove()
+    resetValues()
+  }
+  const setValueOfProductCode = (e) => {
+    
+    console.log(e.target.value);
+    setProductCode(e.target.value)
+  }
+  const setValueOfProductQuantity = (e) => {
+    setProductQuantity(e.target.value)
+  }
+  const handleTransferInfo = (deletedObject) => {
+    setDeletedObject((prev) => ({ ...prev, ...deletedObject }));
+  };
 
-      const handleSubmitDataEntry = () => {}
+  const handleDelete = async () => {
+    try {
+      await dataEntryProductService.remove(deletedObject.deletedId);
+      const newIsSubmitting = { ...isSubmitting };
+      setSubmitting(newIsSubmitting);
+    } catch (error) {
+      console.warn(error);
+    }
+  };
 
-      useEffect(() => {
-        const getDataEntryProducts = async () => {
-          const dataEntryProductResponse = await dataEntryProductService.findAll();
-          setDataEntryProducts(dataEntryProductResponse.data);
-        };
-        getDataEntryProducts();
-      }, [isSubmitting]);
+  const swalWithBootstrapButtons = Swal.mixin({});
 
-      useEffect(() => {
-        const getDataEntry = async () => {
-          const dataEntryResponse = await dataEntryService.getDetail();
-          setDataEntry(dataEntryResponse.data)
-        } 
-        getDataEntry()
-      }, [isSubmitting])
+  const resetValues = () => {
+    setDataEntry({});
+    setDataEntryProducts([]);
+    setProductCode("")
+    setProductQuantity("")
+  };
 
-      return (
-        <>
-        <Formik
+  const handleChangeFlag = () => {
+    setFlag(true);
+  };
+
+  const handleSubmitDataEntryProduct = async (values) => {
+    let newValues = {
+      ...values,
+      quantity: +productQuantity,
+      productDTO: { code: productCode },
+    };
+    console.log(newValues);
+    try {
+      await dataEntryProductService.add(newValues);
+      if (values.quantity >= 0) {
+        setSubmitting(true);
+      }
+      if (isSubmitting) {
+        const newIsSubmitting = { ...isSubmitting };
+        setSubmitting(newIsSubmitting);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmitDataEntry = async (values) => {
+    const newValues = {
+      ...values,
+    };
+    try {
+      await dataEntryService.update(newValues);
+      Swal.fire({
+        icon: "success",
+        title: "Nhập liệu thành công",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      resetValues();
+      setFlag(false);
+    } catch (error) {
+      swalWithBootstrapButtons.fire("Hủy", "Lỗi nhập liệu :)", "error");
+      console.warn(error);
+    }
+  };
+
+  useEffect(() => {
+    const getDataEntryProducts = async () => {
+      const dataEntryProductResponse = await dataEntryProductService.findAll();
+      setDataEntryProducts(dataEntryProductResponse.data);
+    };
+    getDataEntryProducts();
+  }, [isSubmitting]);
+
+  useEffect(() => {
+    const getDataEntry = async () => {
+      const dataEntryResponse = await dataEntryService.getDetail();
+      setDataEntry(dataEntryResponse.data);
+    };
+    getDataEntry();
+  }, [isSubmitting]);
+
+  return (
+    <>
+      <Formik
         initialValues={{
           dataEntryProduct: {
             quantity: "",
             delete: false,
             productDTO: "",
           },
-
+          dataEntry: {
+            employeeName: "",
+          },
         }}
+        validationSchema={Yup.object({
+          name: Yup.string().required("Required."),
+          email: Yup.string().required("Required.").email("abc@gmail.com"),
+          phone: Yup.string()
+            .required("Required."),
+          message: Yup.string().required("Required."),
+        })}
         onSubmit={(values) => {
-          if (values.dataEntryProduct.quantity !== "") {
-            handleSubmitDataEntryProduct(values.dataEntryProduct)
+          if (!flag) {
+            handleSubmitDataEntryProduct(values.dataEntryProduct);
           } else {
-            handleSubmitDataEntry(values.dataEntry)
+            handleSubmitDataEntry(values.dataEntry);
           }
         }}
       >
-        <Form name="data-entry">
+        <Form name="dataEntry" className="mt-5">
           <div className="container col-12 col-md-10 col-lg-8 col-xxl-6">
             <div className="content row">
               <div className="mb-3 text-center row">
                 <h2 className="heading">NHẬP LIỆU</h2>
               </div>
               <div className="row mb-3 input-search p-0">
-                <div className="d-flex justify-content-between">
+                <div className="col-5 d-flex justify-content-between">
                   <label htmlFor="" className="fw-bold">
                     Mã phiếu nhập<span className="colon">:</span>
                   </label>
                   {isSubmitting ? <span>{dataEntry.code}</span> : <span></span>}
                 </div>
-              </div>
-              <div className="row mb-3 input-search p-0">
-                <div className="d-flex justify-content-between">
+                <div className="col-2" />
+                <div className="col-5 d-flex justify-content-between">
                   <label htmlFor="" className="fw-bold">
                     Ngày tháng năm<span className="colon">:</span>{" "}
                   </label>
@@ -109,6 +185,8 @@ function DataEntry(){
                       placeholder="Mã hàng"
                       id="product-code"
                       name="dataEntryProduct.productDTO"
+                      value={productCode}
+                      onChange={(e)=>setValueOfProductCode(e)}
                     />
                   </div>
                   <div className="row mb-3 input-search">
@@ -123,21 +201,20 @@ function DataEntry(){
                       type="number"
                       className="col-6 col-lg-8 input_field me-3"
                       placeholder="Số lượng"
-                      id="product-quantity"
+                      id="productuantity"
                       name="dataEntryProduct.quantity"
+                      value={productQuantity}
+                      onChange={(e)=>setValueOfProductQuantity(e)}
                     />
                   </div>
-                  <div className="row">
-                    <div className="col-6" />
-                    <div className="col-6">
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        style={{ marginLeft: 3 }}
-                      >
-                        Nhập
-                      </button>
-                    </div>
+                  <div className="row d-flex justify-content-center">
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      style={{ width: "150px" }}
+                    >
+                      Ghi thông tin
+                    </button>
                   </div>
                 </fieldset>
               </div>
@@ -164,10 +241,10 @@ function DataEntry(){
                             <td>{dataEntryProduct.productDTO.name}</td>
                             <td>{dataEntryProduct.quantity}</td>
                             {/* <td>
-                                      {invoiceDetail.productDTO.productSizes.map(
-                                        (productSize) => productSize.name
-                                      )}
-                                    </td> */}
+                                    {invoiceDetail.productDTO.productSizes.map(
+                                      (productSize) => productSize.name
+                                    )}
+                                  </td> */}
                             <td>
                               {dataEntryProduct.productDTO.entryPrice.toLocaleString(
                                 "vi-VN",
@@ -180,12 +257,13 @@ function DataEntry(){
                                 className="btn btn-outline-danger"
                                 data-bs-toggle="modal"
                                 data-bs-target="#exampleModal"
-                                // onClick={() =>
-                                //   handleTransferInfo({
-                                //     deletedId: invoiceDetail.id,
-                                //     deletedName: invoiceDetail.productDTO.name,
-                                //   })
-                                // }
+                                onClick={() =>
+                                  handleTransferInfo({
+                                    deletedId: dataEntryProduct.id,
+                                    deletedName:
+                                      dataEntryProduct.productDTO.name,
+                                  })
+                                }
                               >
                                 <i className="bi bi-trash-fill" />
                               </button>
@@ -199,12 +277,33 @@ function DataEntry(){
                   </table>
                 </div>
               </div>
+              <div
+                className="d-flex justify-content-center"
+                style={{ width: "96%", gap: "100px" }}
+              >
+                <button type="button" className="btn btn-secondary" onClick={cancel}>
+                  <i className="bi bi-x-circle"></i>
+                  Huỷ
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  onClick={() => handleChangeFlag()}
+                >
+                  <i className="bi bi-check2-circle"></i>
+                  Nhập
+                </button>
+              </div>
             </div>
           </div>
         </Form>
       </Formik>
-        </>
-      )
+      <ModalDeleteInvoice
+        deletedName={deletedObject.deletedName}
+        onCompletedDelete={handleDelete}
+      />
+    </>
+  );
 }
 
 export default DataEntry;

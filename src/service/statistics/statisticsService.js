@@ -1,6 +1,6 @@
 import request from "../../request";
 
-const listAll = ({month}) => {
+export const listAll = ({month}) => {
     try {
         return request.get(`/statistics?month=${month}`);
     } catch(error){
@@ -8,4 +8,11 @@ const listAll = ({month}) => {
     }
 };
 
-export default listAll;
+export const monthRevenue = ({month}) => {
+    console.log(month);
+    try {
+        return request.get(`/statistics/month-revenue?month=${month}`);
+    } catch(error){
+        console.log(error);
+    }
+};
