@@ -97,7 +97,7 @@ export default function EmployeeDetail() {
                                         style={{ width: 250, height: 250,backgroundColor: "#183661" }}
                                     >
                                         <img
-                                            className="rounded-circle ms-2 mt-2"
+                                            className="rounded-circle ms-2 mt-2 border border-4"
                                             src={detail?.avatar}
                                             alt=""
                                             style={{ width: 230, height: 230 }}
