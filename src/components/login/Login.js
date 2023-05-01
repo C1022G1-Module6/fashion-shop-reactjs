@@ -4,9 +4,9 @@ import { ErrorMessage, Field, Form, Formik } from "formik";
 import loginService from "../../service/loginService";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import './loginStyle.css'
+import loginStyle from './loginStyle.module.css'
+
 import * as Yup from 'yup';
-import employeeService from "../../service/employeeService";
 import { RotatingLines } from "react-loader-spinner";
 import Swal from "sweetalert2";
 export default function Login() {
@@ -56,7 +56,7 @@ export default function Login() {
 
     return (
         <>
-            <section className="h-100 gradient-form" 
+            <section className={`h-100 ${loginStyle.gradientForm}`}
                          style={
                                     showFormEmail || showOtpModal || showFormResetPass ? 
                                      {opacity: '70%'} : {}
@@ -67,7 +67,7 @@ export default function Login() {
                         <div className="col-xl-10" >
                             <div className="card rounded-3 text-black shadow" >
                                 <div className="row g-0">
-                                    <div className="col-lg-6 d-flex align-items-center gradient-custom-2"></div>
+                                    <div className={`col-lg-6 d-flex align-items-center ${loginStyle.gradientCustom2}`}></div>
                                     <div className="col-lg-6">
                                         <div className="card-body p-md-5 mx-md-4">
                                             <div className="text-center">
@@ -88,7 +88,6 @@ export default function Login() {
                                                             const rs = await loginService.login(value)
                                                             localStorage.setItem('token', rs.data.token)
                                                             Swal.fire({
-                                                                width: '25%',
                                                                 icon: 'success',
                                                                 title: 'Đăng nhập thành công',
                                                                 showConfirmButton: false,
@@ -98,14 +97,16 @@ export default function Login() {
                                                         } catch (error) {
                                                             console.log(error);
                                                             const err = error.response.data;
-
+                                                            console.log(err.status);
                                                             if (err.username === "Không được bỏ trống") {
                                                                 document.getElementById("usernameError").innerText = "Không được bỏ trống"
                                                             } else if (err.message === "Tên người dùng không tồn tại") {
                                                                 document.getElementById("usernameError").innerText = "Tên người dùng không tồn tại"
                                                             } else if (err.username === "Tên đăng nhập ít nhất 5 ký tự và nhiều nhất 20 ký tự") {
                                                                 document.getElementById("usernameError").innerText = "Tên đăng nhập ít nhất 5 ký tự và nhiều nhất 20 ký tự"
-                                                            } else {
+                                                            } else if (err.username === "Tên đăng nhập không được chứa ký tự đặc biệt") {
+                                                                document.getElementById("usernameError").innerText = "Tên đăng nhập không được chứa ký tự đặc biệt"
+                                                            }  else {
                                                                 document.getElementById("usernameError").innerText = ""
                                                             }
 
@@ -113,7 +114,7 @@ export default function Login() {
                                                                 document.getElementById("passwordError").innerText = "Không được bỏ trống"
                                                             } else if (err.password === "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự") {
                                                                 document.getElementById("passwordError").innerText = "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự"
-                                                            } else if (err.status === 403) {
+                                                            } else if (err === "" || err.status===403) {
                                                                 document.getElementById("passwordError").innerText = "Mật khẩu không chính xác"
                                                             } else if (err.password === "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự") {
                                                                 document.getElementById("passwordError").innerText = "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự"
@@ -144,7 +145,7 @@ export default function Login() {
                                                         />
                                                     </div>
                                                     <div>
-                                                        <span className="text-danger" id="usernameError"></span>
+                                                        <span className="text-danger " id="usernameError"></span>
                                                         {/* <ErrorMessage component='span' name="username" className="text-danger" /> */}
 
                                                     </div>
@@ -178,7 +179,7 @@ export default function Login() {
                                                     <div className="text-center">
                                                         <a type="button"
                                                             // data-bs-toggle="modal"
-                                                            className="text-muted bg-forgot-password"
+                                                            className={`text-muted ${loginStyle.bgForgotPassword}`}
                                                             // href="#exampleModal"
                                                             onClick={handleShowFromEmail}
                                                         >
@@ -260,7 +261,7 @@ export default function Login() {
                                         </div>
                                         {
                                             isSubmitting ?
-                                                <div className="d-flex justify-content-end me-3">
+                                                <div className="d-flex justify-content-end me-3 pb-2">
                                                     <RotatingLines
                                                         strokeColor="grey"
                                                         strokeWidth="5"
@@ -417,7 +418,6 @@ export default function Login() {
                                 await loginService.resetPassword(value)
                                 setShowFormResetPass(false)
                                 Swal.fire({
-                                    width: '25%',
                                     icon: 'success',
                                     title: 'Thay đổi mật khẩu thành công',
                                     showConfirmButton: false,

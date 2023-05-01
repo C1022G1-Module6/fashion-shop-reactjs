@@ -4,6 +4,7 @@ import employeeService from '../../service/employeeService';
 import { useNavigate } from "react-router-dom";
 import { Field, Form, Formik } from "formik";
 import loginService from "../../service/loginService";
+import Swal from "sweetalert2";
 
 
 
@@ -35,7 +36,14 @@ export default function EmployeeDetail() {
                         try {
                             await loginService.changePassword(value)
                             localStorage.removeItem('token')
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thay đổi mật khẩu thành công. Vui lòng đăng nhập lại',
+                                showConfirmButton: false,
+                                timer: 1500
+                              })
                             navigate('/')
+                            
                         } catch (error) {
                            const err = error.response.data
                            console.log(err);
@@ -85,8 +93,8 @@ export default function EmployeeDetail() {
                             <div className="card w-75 shadow ">
                                 <div className="card-body mt-3 ">
                                     <div
-                                        className="card bg-light shadow"
-                                        style={{ width: 250, height: 250 }}
+                                        className="card  shadow"
+                                        style={{ width: 250, height: 250,backgroundColor: "#183661" }}
                                     >
                                         <img
                                             className="rounded-circle ms-2 mt-2"
@@ -100,9 +108,9 @@ export default function EmployeeDetail() {
                                         <h3 className="text-white pt-3 pb-3 ps-4">THÔNG TIN CÁ NHÂN</h3>
                                     </div>
                                     <hr />
-                                    <div className="container mx-3 ">
-                                        <div className="table-responsive">
-                                            <table>
+                                    <div className="container mx-3">
+                                        <div className="table-responsive ">
+                                            <table >
                                                 <thead>
                                                     <tr className="fs-5">
                                                         <th>Mã nhân viên : </th>
