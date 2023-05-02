@@ -80,12 +80,12 @@ function Invoice() {
 
   const handleTransferCustomerCode = (id, code) => {
     const tr = document.querySelector(`.tr${id}`);
-    if (tr.classList.contains("color")) {
-      tr.classList.remove("color");
+    if (tr.classList.contains(styles.color)) {
+      tr.classList.remove(styles.color);
       setCustomerCode("");
       setDiscount(0);
     } else {
-      tr.classList.add("color");
+      tr.classList.add(styles.color);
       setCustomerCode(code);
     }
   };
@@ -115,7 +115,6 @@ function Invoice() {
   };
 
   const handleSubmitInvoiceDetail = async (values) => {
-    debugger
     let newValues = {
       ...values,
       productDTO: { code: filename },
@@ -130,8 +129,9 @@ function Invoice() {
         setSubmitting(newIsSubmitting);
       }
     } catch (error) {
-      const errorQuantity = document.getElementById("error-quantity");
-      errorQuantity.style.display = "block";
+      let errorMsg = document.getElementById("error");
+      errorMsg.innerHTML = error.response.data;
+      errorMsg.style.display = "block";
       console.warn(error);
     }
   };
@@ -241,11 +241,18 @@ function Invoice() {
   // Lấy mảng khách hàng
   useEffect(() => {
     const getCustomers = async () => {
-      const customersResponse = await customerForInvoiceService.findCustomer(
-        customerFilter
-      );
-      setCustomers(customersResponse.data.content);
-      setPageCount(customersResponse.data.totalPages);
+      try {
+        const customersResponse = await customerForInvoiceService.findCustomer(
+          customerFilter
+        );
+        setCustomers(customersResponse.data.content);
+        setPageCount(customersResponse.data.totalPages);
+      } catch (error) {
+        const customerList = document.getElementById("customer-list");
+        customerList.style.display = "block";
+        setCustomers([]);
+        console.warn(error);
+      }
     };
     getCustomers();
   }, [customerFilter]);
@@ -263,30 +270,30 @@ function Invoice() {
       {/* {console.log("abc")} */}
       <Formik
         initialValues={{
-          invoiceDetail: {
-            quantity: "",
-            delete: false,
-            productDTO: "",
-          },
+          quantity: "",
+          delete: false,
+          productDTO: "",
         }}
-        // validationSchema={Yup.object({
-        //   customerCode: Yup.string().required("Trường này yêu cầu nhập"),
-        //   productDTO: Yup.string().required("Trường này yêu cầu nhập"),
-        //   quantity: Yup.string()
-        //     .required("Trường này yêu cầu nhập")
-        //     .matches("^[1-9][\\d]*$", "Số lượng sách phải là số nguyên dương"),
-        // })}
+        validationSchema={Yup.object({
+          // customerCode: Yup.string().required("Trường này yêu cầu nhập"),
+          // productDTO: Yup.string().required("Trường này yêu cầu nhập"),
+          quantity: Yup.string()
+            .required("Trường này yêu cầu nhập")
+            .matches("^[1-9][\\d]*$", "Số lượng sách phải là số nguyên dương"),
+        })}
         onSubmit={(values) => {
-          handleSubmitInvoiceDetail(values.invoiceDetail);
+          handleSubmitInvoiceDetail(values);
         }}
       >
         <Form>
-          <div className={`${styles.wrapper} container col-12 col-md-10 col-lg-8 col-xxl-6`}>
+          <div
+            className={`${styles.wrapper} container col-12 col-md-10 col-lg-8 col-xxl-6`}
+          >
             <div className={`${styles.content} row`}>
               <div className="mb-3 text-center row">
                 <h2 className={styles.heading}>THANH TOÁN</h2>
               </div>
-              <div className= {`${styles['input-search']} row mb-3 p-0`}>
+              <div className={`${styles["input-search"]} row mb-3 p-0`}>
                 <div className="d-flex justify-content-between">
                   <label htmlFor="" className="fw-bold">
                     Mã hóa đơn<span className={styles.colon}>:</span>
@@ -294,7 +301,7 @@ function Invoice() {
                   {isSubmitting ? <span>{invoice.code}</span> : <span></span>}
                 </div>
               </div>
-              <div className={`${styles['input-search']}row mb-3 p-0`}>
+              <div className={`${styles["input-search"]} row mb-3 p-0`}>
                 <div className="d-flex justify-content-between">
                   <label htmlFor="" className="fw-bold">
                     Ngày tháng năm<span className={styles.colon}>:</span>{" "}
@@ -302,7 +309,7 @@ function Invoice() {
                   {isSubmitting ? <span>{invoice.date}</span> : <span></span>}
                 </div>
               </div>
-              <div className={`${styles['input-search']} row p-0`}>
+              <div className={`${styles["input-search"]} row p-0`}>
                 <div className="d-flex justify-content-between">
                   <label htmlFor="customer-code" className="fw-bold">
                     Mã khách hàng<span className="text-danger">*</span>{" "}
@@ -310,13 +317,14 @@ function Invoice() {
                   </label>
                   <Field
                     type="text"
-                    className={`${styles['customer-input']} ${styles['input_field']} me-3`}
+                    className={`${styles["customer-input"]} ${styles["input_field"]} me-3`}
                     style={{ marginLeft: 8 }}
                     placeholder="Mã khách hàng"
                     id="customer-code"
                     name="customerCode"
                     value={customerCode}
                     onChange={(e) => resetCustomerValue(e)}
+                    required
                   />
                   <button
                     type="button"
@@ -340,7 +348,7 @@ function Invoice() {
                   <legend className="float-none w-auto p-2 fs-5 fw-bold">
                     Thông tin hàng hóa<span className={styles.colon}>:</span>
                   </legend>
-                  <div className={`row mb-3 ${styles['input-search']}`}>
+                  <div className={`row ${styles["input-search"]}`}>
                     <label
                       htmlFor="product-code"
                       className="col-4 col-lg-3 fw-bold"
@@ -350,51 +358,61 @@ function Invoice() {
                     </label>
                     <Field
                       type="text"
-                      className={`${styles['input_field']} col-6 col-lg-8 me-3`}
+                      className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
                       placeholder="Mã hàng"
                       id="product-code"
-                      name="invoiceDetail.productDTO"
+                      name="productDTO"
                       value={filename}
                       onChange={(e) => setProductValue(e)}
+                      required
                     />
+                  </div>
+                  <div className={`row ${styles["input-search"]}`}>
+                    <label className="col-4 col-lg-3 fw-bold"></label>
                     <ErrorMessage
                       component="div"
-                      className="text-danger"
+                      className="text-danger col-6 col-lg-8 me-3"
                       name="productDTO"
                     />
                   </div>
-                  <div className={`row mb-3 ${styles['input-search']}`}>
+                  <div className={`row mt-3 ${styles["input-search"]}`}>
                     <label
                       htmlFor="product-quantity"
                       className="col-4 col-lg-3 fw-bold"
                     >
                       Số lượng<span className="text-danger">*</span>{" "}
                       <span className={styles.colon}>:</span>{" "}
-                      <span
-                        id="error-quantity"
-                        className="text-danger"
-                        style={{ display: "none" }}
-                      >
-                        Mặt hàng này hiện số lượng không đủ yêu cầu của khách
-                        hàng
-                      </span>
                     </label>
                     <Field
                       type="number"
-                      className={`${styles['input_field']} col-6 col-lg-8 me-3`}
+                      className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
                       placeholder="Số lượng"
                       id="product-quantity"
-                      name="invoiceDetail.quantity"
-                    />
-                    <ErrorMessage
-                      component="div"
-                      className="text-danger"
                       name="quantity"
+                      required
                     />
+                    <div className={`row ${styles["input-search"]}`}>
+                      <label className="col-4 col-lg-3 fw-bold"></label>
+                      <ErrorMessage
+                        component="div"
+                        className="text-danger col-6 col-lg-8 me-3"
+                        name="quantity"
+                      />
+                    </div>
                   </div>
-                  <div className="row">
-                    <div className="col-6" />
-                    <div className="col-6">
+                  <div className={`row mt-3 ${styles["input-search"]}`}>
+                    <label className="col-4 col-lg-3 fw-bold"></label>
+                    <div className="col-6 col-lg-8 d-flex justify-content-center">
+                      <span
+                        id="error"
+                        className="text-danger"
+                        style={{ display: "none" }}
+                      ></span>
+                    </div>
+                  </div>
+                  <div className={`row ${styles["input-search"]}`}>
+                    <label className="col-4 col-lg-3 fw-bold"></label>
+                    <div className="col-6 col-lg-8 d-flex justify-content-center">
                       <button
                         type="submit"
                         className="btn btn-primary"
@@ -472,7 +490,10 @@ function Invoice() {
                 </div>
               </div>
 
-              <div className={`${styles['payment-info']} mb-3`} style={{ width: "96%" }}>
+              <div
+                className={`${styles["payment-info"]} mb-3`}
+                style={{ width: "96%" }}
+              >
                 <div className="d-flex justify-content-between">
                   <span className="fw-bold">Tổng: </span>
                   <span>
@@ -546,13 +567,16 @@ function Invoice() {
 
       {/* modal-customer-search */}
       {showModal && (
-        <div className={styles['modal-custom']}>
+        <div className={styles["modal-custom"]}>
           <div
-            className={styles['modal-container']}
+            className={styles["modal-container"]}
             style={{ width: "50%" }}
             ref={modalContainer}
           >
-            <div className={styles['modal-close']} onClick={() => setShowModal(false)}>
+            <div
+              className={styles["modal-close"]}
+              onClick={() => setShowModal(false)}
+            >
               <i className="bi bi-x-lg"></i>
             </div>
             <div className="text-center">
@@ -560,7 +584,7 @@ function Invoice() {
                 TRA CỨU KHÁCH HÀNG
               </h2>
             </div>
-            <div className={styles['modal-body']}>
+            <div className={styles["modal-body"]}>
               <div className="container" style={{ boxShadow: "none" }}>
                 <div className={`${styles.content} row`}>
                   <div className="col-12">
@@ -576,10 +600,12 @@ function Invoice() {
                         }}
                       >
                         <Form>
-                          <div className={`${styles['input-search']} mb-3 d-flex justify-content-between`}>
+                          <div
+                            className={`${styles["input-search"]} mb-3 d-flex justify-content-between`}
+                          >
                             <Field
                               type="text"
-                              className={`${styles['customer-info-input']} ${styles['input_field']}`}
+                              className={`${styles["customer-info-input"]} ${styles["input_field"]}`}
                               placeholder="Nhập mã KH, tên KH hoặc SĐT"
                               name="name"
                             />
@@ -635,6 +661,11 @@ function Invoice() {
                             ))}
                           </tbody>
                         </table>
+                        <div id="customer-list" style={{ display: "none" }}>
+                          <span className="text-danger">
+                            Không tìm thấy khách hàng
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div />
