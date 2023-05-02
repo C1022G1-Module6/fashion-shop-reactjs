@@ -173,7 +173,6 @@ function ListProduct() {
                                                     <i className="bi bi-exclamation-lg"></i> Chi tiết
                                                 </button>
                                             </td>
-
                                         </tr>
                                     )}
 
