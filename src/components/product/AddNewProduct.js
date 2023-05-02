@@ -46,6 +46,7 @@ function AddProductForm() {
                 productSizes: []
             }}
                     onSubmit={(values) => {
+                        console.log(values)
                         const createProduct = async () => {
                             try {
                             const newArr = values.productSizes.filter(value => value !== undefined);
@@ -173,16 +174,12 @@ function AddProductForm() {
                         </div>
                     </div>
 
-                    <div className="mb-3">
-                        <label
-                            htmlFor="image"
-                            className="form-label"
-                            style={{ fontWeight: "bold" }}
-                        >
-                            Hình Ảnh:
-                        </label>
-                        <Field type="file" className="form-control" id="image" name="img" />
-                    </div>
+                <div className="mb-3">
+                    <label htmlFor="image" className="form-label" style={{ fontWeight: "bold" }}>
+                        Hình Ảnh:
+                    </label>
+                    <Field type="file" className="form-control" id="image" name="img" accept="image/*" />
+                </div>
                     <div className="mb-3">
                         <label
                             htmlFor="productType"
