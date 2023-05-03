@@ -47,7 +47,6 @@ function ListProduct() {
         }
         getProductDetails();
     }, [detailId])
-
     useEffect(() => {
         const getProducts = async () => {
             const productsResponse = await productService.search(productFilter);
@@ -86,16 +85,17 @@ function ListProduct() {
     return (
 
         <div>
-            <div>
-                <div className="container mt-5">
-                    <div className="card shadow-lg">
+            <div className="row mx-0 ">
+                <div className="col-3"></div>
+                <div className="container mt-4 col-9 pb-5 px-5">
+                    <div className="card shadow-lg mx-3 px-3 pt-4 ">
                         <div
-                            className="card-header text-white"
+                            className="card-header text-white mx-5"
                             style={{ backgroundColor: "#183661" }}
                         >
-                            <h2 className="text-center">HÀNG TRONG KHO</h2>
+                            <h2 className="text-center pt-1">HÀNG TRONG KHO</h2>
                         </div>
-                        <div className="card-body">
+                        <div className="card-body px-5">
                             <div className="mb-3 d-flex justify-content-between">
                                 <div>
                                     <NavLink to={`/AddNewProduct`}>  <button type="button" className="btn btn-outline-primary w-100">
@@ -104,8 +104,8 @@ function ListProduct() {
                                     </button>
                                     </NavLink>
                                 </div>
-                                <select onChange={(e) => handleGetListByType(e)}>
-                                    <option value="">--- Hãy chọn thể loại ---</option>
+                                <select className="form-select w-25" onChange={(e) => handleGetListByType(e)}>
+                                    <option value="">--- Chọn thể loại ---</option>
                                     {productTypes.map((type) => (
                                         <option key={type.id} value={type.id}>
                                             {type.name}
@@ -148,10 +148,10 @@ function ListProduct() {
                                     <thead>
                                         <tr>
                                             {/*<th>STT</th>*/}
-                                            <th>Mã HÀNG</th>
-                                            <th>TÊN HÀNG</th>
-                                            <th>SỐ LƯỢNG</th>
-                                            <th>ĐƠN GIÁ(VNĐ)</th>
+                                            <th>Mã hàng</th>
+                                            <th>Tên hàng</th>
+                                            <th>Số lượng</th>
+                                            <th>Đơn giá(VNĐ)</th>
                                             <th>Loại</th>
                                             <th>Chi tiết sản phẩm</th>
                                         </tr>

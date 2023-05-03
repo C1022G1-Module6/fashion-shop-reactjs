@@ -53,8 +53,7 @@ function AddProductForm() {
                                 ...values,
                                 productSizes: newArr.map((item) => ({
                                     id: +item[0]
-                                }
-                                )),
+                                })),
                                 productType: {
                                     id: parseInt(values.productType)
                                 }
@@ -68,7 +67,7 @@ function AddProductForm() {
                                 timer: 1500
                             })
 
-                            navigate("/")
+                            navigate("/product")
                         } catch (e) {
                             console.log(e)
                         }
@@ -78,14 +77,15 @@ function AddProductForm() {
                 }}>
 
                 <Form>
-                    <div className="container mt-5 shadow-lg">
+                    <div className="row mx-0">
+                        <div className="col-3"></div>
+                        <div className="container mt-4 col-9">
                         <div className="row justify-content-center">
-                            <div className="col-lg-6 col-md-8 col-sm-10">
-
+                            <div className="col-lg-9 shadow col-md-8 col-sm-10 pt-5 px-5 ">
                                 <h3
-                                    className="text-center py-3 text-white"
+                                    className="text-center py-3 text-white pt-3"
                                     style={{
-                                        padding: "16px 0",
+                                  
                                         backgroundColor: "#183661",
                                         color: "#fff",
                                         marginBottom: 30
@@ -223,6 +223,8 @@ function AddProductForm() {
                             </div>
                         </div>
                     </div>
+                    </div>
+                    
 
                 </Form>
 

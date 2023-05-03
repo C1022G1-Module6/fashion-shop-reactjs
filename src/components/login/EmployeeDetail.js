@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import employeeService from '../../service/employeeService';
-import { useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Field, Form, Formik } from "formik";
 import Swal from "sweetalert2";
 
@@ -21,6 +21,7 @@ export default function EmployeeDetail() {
     }, [])
     const handleLogout = () => {
         localStorage.removeItem('token')
+        localStorage.removeItem('avatar')
         navigate('/')
     }
     return (
@@ -85,13 +86,13 @@ export default function EmployeeDetail() {
             >
                 <Form>
                     <div className="row mx-0">
-                        <div className="col-lg-3 col-md-12 shadow px-0 "></div>
+                        <div className="col-lg-3 col-md-12 px-0 "></div>
                         <div
-                            className=" col-lg-9 col-md-12 d-flex justify-content-center "
+                            className=" col-lg-7 mx-auto col-md-12 "
                             
                         >
-                            <div className="card w-75 shadow ">
-                                <div className="card-body mt-3 ">
+                            <div className="card w-100 shadow-lg ">
+                                <div className="card-body mt-3 px-5">
                                     <div
                                         className="card  shadow"
                                         style={{ width: 250, height: 250,backgroundColor: "#183661" }}
@@ -248,7 +249,6 @@ export default function EmployeeDetail() {
                     </div>
                 </Form>
             </Formik>
-
         </>
     )
 }

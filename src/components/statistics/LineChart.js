@@ -5,18 +5,18 @@ import '../../App.css';
 function LineChart({ chartData }) {
   return (
     <>
-    <div style={{ width: "1000px"}}>
+    <div style={{ width: '100%'}}>
       <Line
         data={chartData}
         options={{
           plugins: {
             title: {
               display: true,
-              width: "50px"
+              width: '100%'
             },
             layout: {
               display: true,
-              width: "1000px"
+              width: '100%'
             },
           },
           scales: {

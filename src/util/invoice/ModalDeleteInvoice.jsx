@@ -10,7 +10,9 @@ function ModalDeleteInvoice(props) {
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
       >
-        <div className="modal-dialog">
+        <div className="row">
+          <div className="col-3"></div>
+        <div className="modal-dialog col-9">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title" id="exampleModalLabel">
@@ -50,6 +52,7 @@ function ModalDeleteInvoice(props) {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

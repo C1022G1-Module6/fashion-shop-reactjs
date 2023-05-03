@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { useState } from "react";
 import ModalDeleteInvoice from "../../util/invoice/ModalDeleteInvoice";
 import styles from "./invoice.module.css";
-// import "./media_query.css";
 import { useRef } from "react";
 import { Field, Form, Formik, ErrorMessage } from "formik";
 import invoiceDetailService from "../../service/invoice/invoiceDetailService";
@@ -80,12 +79,12 @@ function Invoice() {
 
   const handleTransferCustomerCode = (id, code) => {
     const tr = document.querySelector(`.tr${id}`);
-    if (tr.classList.contains("color")) {
-      tr.classList.remove("color");
+    if (tr.classList.contains(styles.color)) {
+      tr.classList.remove(styles.color);
       setCustomerCode("");
       setDiscount(0);
     } else {
-      tr.classList.add("color");
+      tr.classList.add(styles.color);
       setCustomerCode(code);
     }
   };
@@ -129,8 +128,9 @@ function Invoice() {
         setSubmitting(newIsSubmitting);
       }
     } catch (error) {
-      // const errorQuantity = document.getElementById("error-quantity");
-      // errorQuantity.style.display = "block";
+      let errorMsg = document.getElementById("error");
+      errorMsg.innerHTML = error.response.data;
+      errorMsg.style.display = "block";
       console.warn(error);
     }
   };
@@ -239,13 +239,19 @@ function Invoice() {
 
   // Lấy mảng khách hàng
   useEffect(() => {
-    console.log("abc");
     const getCustomers = async () => {
-      const customersResponse = await customerForInvoiceService.findCustomer(
-        customerFilter
-      );
-      setCustomers(customersResponse.data.content);
-      setPageCount(customersResponse.data.totalPages);
+      try {
+        const customersResponse = await customerForInvoiceService.findCustomer(
+          customerFilter
+        );
+        setCustomers(customersResponse.data.content);
+        setPageCount(customersResponse.data.totalPages);
+      } catch (error) {
+        const customerList = document.getElementById("customer-list");
+        customerList.style.display = "block";
+        setCustomers([]);
+        console.warn(error);
+      }
     };
     getCustomers();
   }, [customerFilter]);
@@ -263,296 +269,319 @@ function Invoice() {
       {/* {console.log("abc")} */}
       <Formik
         initialValues={{
-          invoiceDetail: {
-            quantity: "",
-            delete: false,
-            productDTO: "",
-          },
+          quantity: "",
+          delete: false,
+          productDTO: "",
         }}
-        // validationSchema={Yup.object({
-        //   customerCode: Yup.string().required("Trường này yêu cầu nhập"),
-        //   productDTO: Yup.string().required("Trường này yêu cầu nhập"),
-        //   quantity: Yup.string()
-        //     .required("Trường này yêu cầu nhập")
-        //     .matches("^[1-9][\\d]*$", "Số lượng sách phải là số nguyên dương"),
-        // })}
+        validationSchema={Yup.object({
+          // customerCode: Yup.string().required("Trường này yêu cầu nhập"),
+          // productDTO: Yup.string().required("Trường này yêu cầu nhập"),
+          quantity: Yup.string()
+            .required("Trường này yêu cầu nhập")
+            .matches("^[1-9][\\d]*$", "Số lượng sách phải là số nguyên dương"),
+        })}
         onSubmit={(values) => {
-          handleSubmitInvoiceDetail(values.invoiceDetail);
+          handleSubmitInvoiceDetail(values);
         }}
       >
-        <Form className={styles.body}>
-          <div className={`${styles.wrapper} container col-12 col-md-10 col-lg-8 col-xxl-6`}>
-            <div className={`${styles.content} row`}>
-              <div className="mb-3 text-center row">
-                <h2 className={styles.heading}>THANH TOÁN</h2>
-              </div>
-              <div className= {`${styles['input-search']} row mb-3 p-0`}>
-                <div className="d-flex justify-content-between">
-                  <label htmlFor="" className="fw-bold">
-                    Mã hóa đơn<span className={styles.colon}>:</span>
-                  </label>
-                  {isSubmitting ? <span>{invoice?.code}</span> : <span></span>}
+        <Form>
+          <div className="row mx-0 ">
+            <div className="col-3"></div>
+            <div
+              className={`${styles.wrapper} container mt-3 col-12 col-md-10 col-lg-8 col-xxl-6 mb-5`}
+            >
+              <div className={`${styles.content} row`}>
+                <div className="mb-3 text-center row">
+                  <h2 className={styles.heading}>THANH TOÁN</h2>
                 </div>
-              </div>
-              <div className={`${styles['input-search']} row mb-3 p-0`}>
-                <div className="d-flex justify-content-between">
-                  <label htmlFor="" className="fw-bold">
-                    Ngày tháng năm<span className={styles.colon}>:</span>{" "}
-                  </label>
-                  {isSubmitting ? <span>{invoice?.date}</span> : <span></span>}
+                <div className={`${styles["input-search"]} row mb-3 p-0`}>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor="" className="fw-bold">
+                      Mã hóa đơn<span className={styles.colon}>:</span>
+                    </label>
+                    {isSubmitting ? <span>{invoice.code}</span> : <span></span>}
+                  </div>
                 </div>
-              </div>
-              <div className={`${styles['input-search']} row p-0`}>
-                <div className="d-flex justify-content-between">
-                  <label htmlFor="customer-code" className="fw-bold">
-                    Mã khách hàng<span className="text-danger">*</span>{" "}
-                    <span className={styles.colon}>:</span>{" "}
-                  </label>
-                  <Field
-                    type="text"
-                    className={`${styles['customer-input']} ${styles['input_field']} me-3`}
-                    style={{ marginLeft: 8 }}
-                    placeholder="Mã khách hàng"
-                    id="customer-code"
-                    name="customerCode"
-                    value={customerCode}
-                    onChange={(e) => resetCustomerValue(e)}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => setShowModal(true)}
-                  >
-                    <i className="bi bi-search" />{" "}
-                    <span className="d-none d-lg-inline">
-                      Tra cứu khách hàng
-                    </span>
-                  </button>
+                <div className={`${styles["input-search"]} row mb-3 p-0`}>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor="" className="fw-bold">
+                      Ngày tháng năm<span className={styles.colon}>:</span>{" "}
+                    </label>
+                    {isSubmitting ? <span>{invoice.date}</span> : <span></span>}
+                  </div>
                 </div>
-              </div>
-              <ErrorMessage
-                component="div"
-                className="text-danger d-flex justify-content-center"
-                name="customerCode"
-              />
-              <div className="row">
-                <fieldset className="border border-secondary p-2 mb-3 w-100">
-                  <legend className="float-none w-auto p-2 fs-5 fw-bold">
-                    Thông tin hàng hóa<span className={styles.colon}>:</span>
-                  </legend>
-                  <div className={`row mb-3 ${styles['input-search']}`}>
-                    <label
-                      htmlFor="product-code"
-                      className="col-4 col-lg-3 fw-bold"
-                    >
-                      Mã hàng<span className="text-danger">*</span>{" "}
+                <div className={`${styles["input-search"]} row p-0`}>
+                  <div className="d-flex justify-content-between">
+                    <label htmlFor="customer-code" className="fw-bold">
+                      Mã khách hàng<span className="text-danger">*</span>{" "}
                       <span className={styles.colon}>:</span>{" "}
                     </label>
                     <Field
                       type="text"
-                      className={`${styles['input_field']} col-6 col-lg-8 me-3`}
-                      placeholder="Mã hàng"
-                      id="product-code"
-                      name="invoiceDetail.productDTO"
-                      value={filename}
-                      onChange={(e) => setProductValue(e)}
+                      className={`${styles["customer-input"]} ${styles["input_field"]} me-3`}
+                      style={{ marginLeft: 8 }}
+                      placeholder="Mã khách hàng"
+                      id="customer-code"
+                      name="customerCode"
+                      value={customerCode}
+                      onChange={(e) => resetCustomerValue(e)}
+                      required
                     />
-                    <ErrorMessage
-                      component="div"
-                      className="text-danger"
-                      name="productDTO"
-                    />
-                  </div>
-                  <div className={`row mb-3 ${styles['input-search']}`}>
-                    <label
-                      htmlFor="product-quantity"
-                      className="col-4 col-lg-3 fw-bold"
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => setShowModal(true)}
                     >
-                      Số lượng<span className="text-danger">*</span>{" "}
-                      <span className={styles.colon}>:</span>{" "}
-                      <span
-                        id="error-quantity"
-                        className="text-danger"
-                        style={{ display: "none" }}
-                      >
-                        Mặt hàng này hiện số lượng không đủ yêu cầu của khách
-                        hàng
+                      <i className="bi bi-search" />{" "}
+                      <span className="d-none d-lg-inline">
+                        Tra cứu khách hàng
                       </span>
-                    </label>
-                    <Field
-                      type="number"
-                      className={`${styles['input_field']} col-6 col-lg-8 me-3`}
-                      placeholder="Số lượng"
-                      id="product-quantity"
-                      name="invoiceDetail.quantity"
-                    />
-                    <ErrorMessage
-                      component="div"
-                      className="text-danger"
-                      name="quantity"
-                    />
+                    </button>
                   </div>
-                  <div className="row">
-                    <div className="col-6" />
-                    <div className="col-6">
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        style={{ marginLeft: 3 }}
+                </div>
+                <ErrorMessage
+                  component="div"
+                  className="text-danger d-flex justify-content-center"
+                  name="customerCode"
+                />
+                <div className="row">
+                  <fieldset className="border border-secondary p-2 mb-3 w-100">
+                    <legend className="float-none w-auto p-2 fs-5 fw-bold">
+                      Thông tin hàng hóa<span className={styles.colon}>:</span>
+                    </legend>
+                    <div className={`row ${styles["input-search"]}`}>
+                      <label
+                        htmlFor="product-code"
+                        className="col-4 col-lg-3 fw-bold"
                       >
-                        Nhập
-                      </button>
+                        Mã hàng<span className="text-danger">*</span>{" "}
+                        <span className={styles.colon}>:</span>{" "}
+                      </label>
+                      <Field
+                        type="text"
+                        className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
+                        placeholder="Mã hàng"
+                        id="product-code"
+                        name="productDTO"
+                        value={filename}
+                        onChange={(e) => setProductValue(e)}
+                        required
+                      />
                     </div>
-                  </div>
-                </fieldset>
-              </div>
-              <div className="mb-3 row">
-                <div className="table-responsive p-0">
-                  <table className="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>STT</th>
-                        <th>Mã hàng</th>
-                        <th>Tên hàng</th>
-                        <th>Số lượng</th>
-                        {/* <th>Size</th> */}
-                        <th>Đơn giá</th>
-                        <th>Tổng</th>
-                        <th>Xóa</th>
-                      </tr>
-                    </thead>
-                    {isSubmitting ? (
-                      <tbody>
-                        {invoiceDetails.map((invoiceDetail, index) => (
-                          <tr key={invoiceDetail.id}>
-                            <td>{++index}</td>
-                            <td>{invoiceDetail.productDTO.code}</td>
-                            <td>{invoiceDetail.productDTO.name}</td>
-                            <td>{invoiceDetail.quantity}</td>
-                            {/* <td>
+                    <div className={`row ${styles["input-search"]}`}>
+                      <label className="col-4 col-lg-3 fw-bold"></label>
+                      <ErrorMessage
+                        component="div"
+                        className="text-danger col-6 col-lg-8 me-3"
+                        name="productDTO"
+                      />
+                    </div>
+                    <div className={`row mt-3 ${styles["input-search"]}`}>
+                      <label
+                        htmlFor="product-quantity"
+                        className="col-4 col-lg-3 fw-bold"
+                      >
+                        Số lượng<span className="text-danger">*</span>{" "}
+                        <span className={styles.colon}>:</span>{" "}
+                      </label>
+                      <Field
+                        type="number"
+                        className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
+                        placeholder="Số lượng"
+                        id="product-quantity"
+                        name="quantity"
+                        required
+                      />
+                      <div className={`row ${styles["input-search"]}`}>
+                        <label className="col-4 col-lg-3 fw-bold"></label>
+                        <ErrorMessage
+                          component="div"
+                          className="text-danger col-6 col-lg-8 me-3"
+                          name="quantity"
+                        />
+                      </div>
+                    </div>
+                    <div className={`row mt-3 ${styles["input-search"]}`}>
+                      <label className="col-4 col-lg-3 fw-bold"></label>
+                      <div className="col-6 col-lg-8 d-flex justify-content-center">
+                        <span
+                          id="error"
+                          className="text-danger"
+                          style={{ display: "none" }}
+                        ></span>
+                      </div>
+                    </div>
+                    <div className={`row ${styles["input-search"]}`}>
+                      <label className="col-4 col-lg-3 fw-bold"></label>
+                      <div className="col-6 col-lg-8 d-flex justify-content-center">
+                        <button
+                          type="submit"
+                          className="btn btn-primary"
+                          style={{ marginLeft: 3 }}
+                        >
+                          Nhập
+                        </button>
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+                <div className="mb-3 row">
+                  <div className="table-responsive p-0">
+                    <table className="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>STT</th>
+                          <th>Mã hàng</th>
+                          <th>Tên hàng</th>
+                          <th>Số lượng</th>
+                          {/* <th>Size</th> */}
+                          <th>Đơn giá</th>
+                          <th>Tổng</th>
+                          <th>Xóa</th>
+                        </tr>
+                      </thead>
+                      {isSubmitting ? (
+                        <tbody>
+                          {invoiceDetails.map((invoiceDetail, index) => (
+                            <tr key={invoiceDetail.id}>
+                              <td>{++index}</td>
+                              <td>{invoiceDetail.productDTO.code}</td>
+                              <td>{invoiceDetail.productDTO.name}</td>
+                              <td>{invoiceDetail.quantity}</td>
+                              {/* <td>
                               {invoiceDetail.productDTO.productSizes.map(
                                 (productSize) => productSize.name
                               )}
                             </td> */}
-                            <td>
-                              {invoiceDetail.productDTO.sellingPrice.toLocaleString(
-                                "vi-VN",
-                                { style: "currency", currency: "VND" }
-                              )}
-                            </td>
-                            <td>
-                              {invoiceDetail.total.toLocaleString("vi-VN", {
-                                style: "currency",
-                                currency: "VND",
-                              })}
-                            </td>
-                            <td>
-                              <button
-                                type="button"
-                                className="btn btn-outline-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModal"
-                                onClick={() =>
-                                  handleTransferInfo({
-                                    deletedId: invoiceDetail.id,
-                                    deletedName: invoiceDetail.productDTO.name,
-                                  })
-                                }
-                              >
-                                <i className="bi bi-trash-fill" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    ) : (
-                      <tbody></tbody>
-                    )}
-                  </table>
+                              <td>
+                                {invoiceDetail.productDTO.sellingPrice.toLocaleString(
+                                  "vi-VN",
+                                  { style: "currency", currency: "VND" }
+                                )}
+                              </td>
+                              <td>
+                                {invoiceDetail.total.toLocaleString("vi-VN", {
+                                  style: "currency",
+                                  currency: "VND",
+                                })}
+                              </td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-danger"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#exampleModal"
+                                  onClick={() =>
+                                    handleTransferInfo({
+                                      deletedId: invoiceDetail.id,
+                                      deletedName: invoiceDetail.productDTO.name,
+                                    })
+                                  }
+                                >
+                                  <i className="bi bi-trash-fill" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      ) : (
+                        <tbody></tbody>
+                      )}
+                    </table>
+                  </div>
                 </div>
-              </div>
 
-              <div className={`${styles['payment-info']} mb-3`} style={{ width: "96%" }}>
-                <div className="d-flex justify-content-between">
-                  <span className="fw-bold">Tổng: </span>
-                  <span>
-                    {invoiceFilter.total.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </span>
+                <div
+                  className={`${styles["payment-info"]} mb-3`}
+                  style={{ width: "96%" }}
+                >
+                  <div className="d-flex justify-content-between">
+                    <span className="fw-bold">Tổng: </span>
+                    <span>
+                      {invoiceFilter.total.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="fw-bold">Giảm giá: </span>
+                    <span>
+                      {discount?.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </span>
+                  </div>
+                  <div className="d-flex justify-content-between">
+                    <span className="fw-bold fs-5">Thành tiền: </span>
+                    <span className="fw-bold fs-5">
+                      {invoiceFilter.payment.toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </span>
+                  </div>
                 </div>
-                <div className="d-flex justify-content-between">
-                  <span className="fw-bold">Giảm giá: </span>
-                  <span>
-                    {discount?.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </span>
-                </div>
-                <div className="d-flex justify-content-between">
-                  <span className="fw-bold fs-5">Thành tiền: </span>
-                  <span className="fw-bold fs-5">
-                    {invoiceFilter.payment.toLocaleString("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    })}
-                  </span>
-                </div>
-              </div>
-              <div
-                className="d-flex justify-content-between"
-                style={{ width: "96%" }}
-              >
-                <div className="qr-image">
-                  <label htmlFor="qr-file" style={{ width: 45 }}>
-                    <img
-                      src="./img/tải xuống.png"
-                      alt="Avatar"
-                      width="100%"
-                      style={{ cursor: "pointer" }}
+                <div
+                  className="d-flex justify-content-between"
+                  style={{ width: "96%" }}
+                >
+                  <div className="qr-image">
+                    <label htmlFor="qr-file" style={{ width: 45 }}>
+                      <img
+                        src="./img/tải xuống.png"
+                        alt="Avatar"
+                        width="100%"
+                        style={{ cursor: "pointer" }}
+                      />
+                    </label>
+                    <input
+                      type="file"
+                      id="qr-file"
+                      className="d-none"
+                      onChange={handleFileSelect}
                     />
-                  </label>
-                  <input
-                    type="file"
-                    id="qr-file"
-                    className="d-none"
-                    onChange={handleFileSelect}
-                  />
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-outline-primary button"
+                    style={{ backgroundColor: "none" }}
+                    data-bs-toggle="modal"
+                    data-bs-target="#exampleModal1"
+                    onClick={() => handleTransferInfoToModal()}
+                  >
+                    <i className="bi bi-printer-fill" /> In hóa đơn
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleResetInvoice()}
+                    className="btn btn-outline-secondary"
+                  >
+                    Hủy
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  className="btn btn-outline-primary button"
-                  style={{ backgroundColor: "none" }}
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal1"
-                  onClick={() => handleTransferInfoToModal()}
-                >
-                  <i className="bi bi-printer-fill" /> In hóa đơn
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleResetInvoice()}
-                  className="btn btn-outline-secondary"
-                >
-                  Hủy
-                </button>
               </div>
             </div>
+
           </div>
+
         </Form>
       </Formik>
 
       {/* modal-customer-search */}
       {showModal && (
-        <div className={styles['modal-custom']}>
+        <div className={styles["modal-custom"]}>
+          <div className="col-3"></div>
           <div
-            className={styles['modal-container']}
+            className={`${styles["modal-container"]} col-9 `}
             style={{ width: "50%" }}
             ref={modalContainer}
           >
-            <div className={styles['modal-close']} onClick={() => setShowModal(false)}>
+            <div
+              className={styles["modal-close"]}
+              onClick={() => setShowModal(false)}
+            >
               <i className="bi bi-x-lg"></i>
             </div>
             <div className="text-center">
@@ -560,7 +589,8 @@ function Invoice() {
                 TRA CỨU KHÁCH HÀNG
               </h2>
             </div>
-            <div className={styles['modal-body']}>
+            <div className={styles["modal-body"]}>
+      
               <div className="container" style={{ boxShadow: "none" }}>
                 <div className={`${styles.content} row`}>
                   <div className="col-12">
@@ -576,10 +606,12 @@ function Invoice() {
                         }}
                       >
                         <Form>
-                          <div className={`${styles['input-search']} mb-3 d-flex justify-content-between`}>
+                          <div
+                            className={`${styles["input-search"]} mb-3 d-flex justify-content-between`}
+                          >
                             <Field
                               type="text"
-                              className={`${styles['customer-info-input']} ${styles['input_field']}`}
+                              className={`${styles["customer-info-input"]} ${styles["input_field"]}`}
                               placeholder="Nhập mã KH, tên KH hoặc SĐT"
                               name="name"
                             />
@@ -635,6 +667,11 @@ function Invoice() {
                             ))}
                           </tbody>
                         </table>
+                        <div id="customer-list" style={{ display: "none" }}>
+                          <span className="text-danger">
+                            Không tìm thấy khách hàng
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div />
@@ -671,7 +708,9 @@ function Invoice() {
 
       {/* {modal-print} */}
       <div className="modal fade" id="exampleModal1">
-        <div className="modal-dialog" style={{ maxWidth: "800px" }}>
+        <div className="row ">
+        <div className="col-3"></div>
+        <div className="modal-dialog col-9" style={{ maxWidth: "800px" }}>
           <div className="modal-content">
             <div className="modal-body p-0">
               <div ref={componentBRef}>
@@ -697,6 +736,7 @@ function Invoice() {
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </>

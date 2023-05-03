@@ -61,7 +61,9 @@ function Statistics() {
 
   return (
     <>
-      <div className="container-fluid p-0">
+    <div className="col-3"></div>
+    <div className="col-8 m-auto mt-4 pb-5">
+      <div className="container-fluid pt-4 px-5 shadow-lg">
         <div className="row p-0 m-0">
           <div className="col-sm-12 col-lg-12 col-md-12 p-0">
             <legend class={`${styles.heading} fw-bolder text-center mb-3`}>
@@ -108,7 +110,7 @@ function Statistics() {
                     Chọn
                   </button>
                 </div>
-                <div className="d-flex justify-content-center">
+                <div className="d-flex justify-content-center mx-5">
                   <LineChart chartData={chartData} />
                 </div>
                 <div className="d-flex justify-content-center mt-4 mb-4">
@@ -131,6 +133,7 @@ function Statistics() {
             </Formik>
           </div>
         </div>
+      </div>
       </div>
     </>
   );

@@ -87,13 +87,14 @@ export default function Login() {
                                                         try {
                                                             const rs = await loginService.login(value)
                                                             localStorage.setItem('token', rs.data.token)
+                                                            localStorage.setItem('avatar', rs.data.avatar)
                                                             Swal.fire({
                                                                 icon: 'success',
                                                                 title: 'Đăng nhập thành công',
                                                                 showConfirmButton: false,
                                                                 timer: 1500
                                                             })
-                                                            navigate('/employee')
+                                                            navigate('/home')
                                                         } catch (error) {
                                                             console.log(error);
                                                             const err = error.response.data;
