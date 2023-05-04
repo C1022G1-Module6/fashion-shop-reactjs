@@ -19,6 +19,7 @@ function DataEntry() {
     deletedId: "",
     deletedName: "",
   });
+  const employeeName = localStorage.getItem('name')
 
   const cancel = async () => {
     dataEntryService.remove();
@@ -82,6 +83,7 @@ function DataEntry() {
   const handleSubmitDataEntry = async (values) => {
     const newValues = {
       ...values,
+      employeeName: employeeName
     };
     try {
       await dataEntryService.update(newValues);
@@ -117,7 +119,7 @@ function DataEntry() {
 
   return (
     <div className={styles.body}>
-    
+
       <Formik
         initialValues={{
           dataEntryProduct: {
@@ -144,162 +146,166 @@ function DataEntry() {
         }}
       >
         <Form className="mt-5">
-          <div
-            className={`${styles.wrapper} container col-12 col-md-10 col-lg-8 col-xxl-6`}
-          >
-            <div className={`${styles.content} row `}>
-              <div className="mb-3 text-center row">
-                <h2 className={styles.heading}>NHẬP LIỆU</h2>
-              </div>
-              <div className="row mb-3 p-0">
-                <div className="col-5">
-                  <label htmlFor="" className="fw-bold">
-                    Mã phiếu nhập <span className={styles.colon}>:</span>
-                  </label>
-                  {isSubmitting ? <span> {dataEntry.code}</span> : <span></span>}
+          <div className="row mx-0">
+            <div className="col-3"></div>
+            <div
+              className={`${styles.wrapper} container mt-5 col-9 col-md-10 col-lg-8 col-xxl-6`}
+            >
+              <div className={`${styles.content} row `}>
+                <div className="mb-3 text-center row">
+                  <h2 className={styles.heading}>NHẬP LIỆU</h2>
                 </div>
-                <div className="col-2" />
-                <div className="col-5">
-                  <label htmlFor="" className="fw-bold">
-                    Ngày tháng năm <span className={styles.colon}>:</span>{" "}
-                  </label>
-                  {isSubmitting ? <span> {dataEntry.date}</span> : <span></span>}
+                <div className="row mb-3 p-0">
+                  <div className="col-5">
+                    <label htmlFor="" className="fw-bold">
+                      Mã phiếu nhập <span className={styles.colon}>:</span>
+                    </label>
+                    {isSubmitting ? <span> {dataEntry?.code}</span> : <span></span>}
+                  </div>
+                  <div className="col-2" />
+                  <div className="col-5">
+                    <label htmlFor="" className="fw-bold">
+                      Ngày tháng năm <span className={styles.colon}>:</span>{" "}
+                    </label>
+                    {isSubmitting ? <span> {dataEntry?.date}</span> : <span></span>}
+                  </div>
                 </div>
-              </div>
-              <div className="row">
-                <fieldset className="border border-secondary p-2 mb-3 w-100">
-                  <legend className="float-none w-auto p-2 fs-5 fw-bold">
-                    Thông tin nhập liệu<span className={styles.colon}>:</span>
-                  </legend>
-                  <div className={`${styles["input-search"]} row mb-3`}>
-                    <label
-                      htmlFor="product-code"
-                      className="col-4 col-lg-3 fw-bold"
-                    >
-                      Mã hàng<span className="text-danger">*</span>{" "}
-                      <span className={styles.colon}>:</span>{" "}
-                    </label>
-                    <Field
-                      type="text"
-                      className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
-                      placeholder="Mã hàng"
-                      id="product-code"
-                      name="dataEntryProduct.productDTO"
-                      value={productCode}
-                      onChange={(e) => setValueOfProductCode(e)}
-                    />
-                  </div>
-                  <div className={`${styles["input-search"]} row mb-3`}>
-                    <label
-                      htmlFor="product-quantity"
-                      className="col-4 col-lg-3 fw-bold"
-                    >
-                      Số lượng<span className="text-danger">*</span>{" "}
-                      <span className="colon">:</span>{" "}
-                    </label>
-                    <Field
-                      type="number"
-                      className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
-                      placeholder="Số lượng"
-                      id="productuantity"
-                      name="dataEntryProduct.quantity"
-                      value={productQuantity}
-                      onChange={(e) => setValueOfProductQuantity(e)}
-                    />
-                  </div>
-                  <div className="row d-flex justify-content-center">
-                    <button
-                      type="submit"
-                      className="btn btn-outline-primary"
-                      style={{ width: "150px" }}
-                    >
-                      Ghi thông tin
-                    </button>
-                  </div>
-                </fieldset>
-              </div>
-              <div className="mb-3 row">
-                <div className="table-responsive p-0">
-                  <table className="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>STT</th>
-                        <th>Mã hàng</th>
-                        <th>Tên hàng</th>
-                        <th>Số lượng</th>
-                        {/* <th>Size</th> */}
-                        <th>Đơn giá</th>
-                        <th>Xóa</th>
-                      </tr>
-                    </thead>
-                    {isSubmitting ? (
-                      <tbody>
-                        {dataEntryProducts.map((dataEntryProduct, index) => (
-                          <tr key={dataEntryProduct.id}>
-                            <td>{++index}</td>
-                            <td>{dataEntryProduct.productDTO.code}</td>
-                            <td>{dataEntryProduct.productDTO.name}</td>
-                            <td>{dataEntryProduct.quantity}</td>
-                            {/* <td>
+                <div className="row">
+                  <fieldset className="border border-secondary p-2 mb-3 w-100">
+                    <legend className="float-none w-auto p-2 fs-5 fw-bold">
+                      Thông tin nhập liệu<span className={styles.colon}>:</span>
+                    </legend>
+                    <div className={`${styles["input-search"]} row mb-3`}>
+                      <label
+                        htmlFor="product-code"
+                        className="col-4 col-lg-3 fw-bold"
+                      >
+                        Mã hàng<span className="text-danger">*</span>{" "}
+                        <span className={styles.colon}>:</span>{" "}
+                      </label>
+                      <Field
+                        type="text"
+                        className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
+                        placeholder="Mã hàng"
+                        id="product-code"
+                        name="dataEntryProduct.productDTO"
+                        value={productCode}
+                        onChange={(e) => setValueOfProductCode(e)}
+                      />
+                    </div>
+                    <div className={`${styles["input-search"]} row mb-3`}>
+                      <label
+                        htmlFor="product-quantity"
+                        className="col-4 col-lg-3 fw-bold"
+                      >
+                        Số lượng<span className="text-danger">*</span>{" "}
+                        <span className="colon">:</span>{" "}
+                      </label>
+                      <Field
+                        type="number"
+                        className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
+                        placeholder="Số lượng"
+                        id="productuantity"
+                        name="dataEntryProduct.quantity"
+                        value={productQuantity}
+                        onChange={(e) => setValueOfProductQuantity(e)}
+                      />
+                    </div>
+                    <div className="row d-flex justify-content-center">
+                      <button
+                        type="submit"
+                        className="btn btn-outline-primary"
+                        style={{ width: "150px" }}
+                      >
+                        Ghi thông tin
+                      </button>
+                    </div>
+                  </fieldset>
+                </div>
+                <div className="mb-3 row">
+                  <div className="table-responsive p-0">
+                    <table className="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>STT</th>
+                          <th>Mã hàng</th>
+                          <th>Tên hàng</th>
+                          <th>Số lượng</th>
+                          {/* <th>Size</th> */}
+                          <th>Đơn giá</th>
+                          <th>Xóa</th>
+                        </tr>
+                      </thead>
+                      {isSubmitting ? (
+                        <tbody>
+                          {dataEntryProducts.map((dataEntryProduct, index) => (
+                            <tr key={dataEntryProduct.id}>
+                              <td>{++index}</td>
+                              <td>{dataEntryProduct.productDTO.code}</td>
+                              <td>{dataEntryProduct.productDTO.name}</td>
+                              <td>{dataEntryProduct.quantity}</td>
+                              {/* <td>
                                     {invoiceDetail.productDTO.productSizes.map(
                                       (productSize) => productSize.name
                                     )}
                                   </td> */}
-                            <td>
-                              {dataEntryProduct.productDTO.entryPrice.toLocaleString(
-                                "vi-VN",
-                                { style: "currency", currency: "VND" }
-                              )}
-                            </td>
-                            <td>
-                              <button
-                                type="button"
-                                className="btn btn-outline-danger"
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModal"
-                                onClick={() =>
-                                  handleTransferInfo({
-                                    deletedId: dataEntryProduct.id,
-                                    deletedName:
-                                      dataEntryProduct.productDTO.name,
-                                  })
-                                }
-                              >
-                                <i className="bi bi-trash-fill" />
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    ) : (
-                      <tbody></tbody>
-                    )}
-                  </table>
+                              <td>
+                                {dataEntryProduct.productDTO.entryPrice.toLocaleString(
+                                  "vi-VN",
+                                  { style: "currency", currency: "VND" }
+                                )}
+                              </td>
+                              <td>
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-danger"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#exampleModal"
+                                  onClick={() =>
+                                    handleTransferInfo({
+                                      deletedId: dataEntryProduct.id,
+                                      deletedName:
+                                        dataEntryProduct.productDTO.name,
+                                    })
+                                  }
+                                >
+                                  <i className="bi bi-trash-fill" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      ) : (
+                        <tbody></tbody>
+                      )}
+                    </table>
+                  </div>
                 </div>
-              </div>
-              <div
-                className="d-flex justify-content-center"
-                style={{ width: "96%", gap: "50px" }}
-              >
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={cancel}
+                <div
+                  className="d-flex justify-content-center"
+                  style={{ width: "96%", gap: "50px" }}
                 >
-                  <i className="bi bi-x-circle"></i>
-                  Huỷ
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  onClick={() => handleChangeFlag()}
-                >
-                  <i className="bi bi-check2-circle"></i>
-                  Nhập
-                </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={cancel}
+                  >
+                    <i className="bi bi-x-circle"></i>
+                    Huỷ
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    onClick={() => handleChangeFlag()}
+                  >
+                    <i className="bi bi-check2-circle"></i>
+                    Nhập
+                  </button>
+                </div>
               </div>
             </div>
           </div>
+
         </Form>
       </Formik>
       <ModalDeleteInvoice

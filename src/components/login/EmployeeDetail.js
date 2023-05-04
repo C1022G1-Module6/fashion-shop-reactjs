@@ -21,8 +21,12 @@ export default function EmployeeDetail() {
     }, [])
     const handleLogout = () => {
         localStorage.removeItem('token')
-        localStorage.removeItem('avatar')
+        localStorage.removeItem('roles')
+        localStorage.removeItem('name')
         navigate('/')
+    }
+    if(!detail){
+        return null
     }
     return (
         <>

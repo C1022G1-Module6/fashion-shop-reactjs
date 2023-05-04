@@ -1,5 +1,5 @@
 import request from "../../request";
-const token = localStorage.getItem('token')
+
 const search = ({name,page}) => {
     const token = localStorage.getItem('token')
     return request.get(`/api/user/product/search?productName=${name ? name : "" }&code=${name? name : "" }&page=${page?page:0}` ,{
@@ -10,6 +10,7 @@ const search = ({name,page}) => {
 }
 
 const saveProduct = (value) => {
+    const token = localStorage.getItem('token')
     return request.post(`/api/user/product/create-product`, { ...value },{
         headers: {
             'Authorization': `Bearer ${token}`
@@ -18,6 +19,7 @@ const saveProduct = (value) => {
 }
 
 const getAllProductDetail = (id) => {
+    const token = localStorage.getItem('token')
     return request.get(`/api/user/product/detail?id=${id}`,{
         headers: {
             'Authorization': `Bearer ${token}`
@@ -26,6 +28,7 @@ const getAllProductDetail = (id) => {
 }
 
 const searchWithType = ({name, page}) => {
+    const token = localStorage.getItem('token')
     if (name === 0) {
         name = ""
     }

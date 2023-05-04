@@ -51,7 +51,6 @@ export default function Login() {
         }
         return () => clearInterval(intervalId);
     }, [countdown]);
-    console.log(countdown);
 
 
     return (
@@ -87,7 +86,8 @@ export default function Login() {
                                                         try {
                                                             const rs = await loginService.login(value)
                                                             localStorage.setItem('token', rs.data.token)
-                                                            localStorage.setItem('avatar', rs.data.avatar)
+                                                            localStorage.setItem('name', rs.data.name)
+                                                            localStorage.setItem('roles', rs.data.roles[0].authority)
                                                             Swal.fire({
                                                                 icon: 'success',
                                                                 title: 'Đăng nhập thành công',
@@ -98,7 +98,6 @@ export default function Login() {
                                                         } catch (error) {
                                                             console.log(error);
                                                             const err = error.response.data;
-                                                            console.log(err.status);
                                                             if (err.username === "Không được bỏ trống") {
                                                                 document.getElementById("usernameError").innerText = "Không được bỏ trống"
                                                             } else if (err.message === "Tên người dùng không tồn tại") {
@@ -215,7 +214,6 @@ export default function Login() {
 
                             } catch (error) {
                                 setSubmitting(false)
-                                console.log(error.response.data);
                                 if (error.response.data.email === "Không được để trống") {
                                     document.getElementById("emailErr").innerHTML = "Không được để trống"
                                 } else if (error.response.data.email === "Vui lòng nhập đúng định dạng Email VD: abc123@codegym.com") {
@@ -426,7 +424,6 @@ export default function Login() {
                                 })
                             } catch (error) {
                                 const err = error.response.data
-                                console.log(err);
                                 if (err.newPassword === "Không được bỏ trống") {
                                     document.getElementById("newPasswordErr").innerHTML = "Không được bỏ trống"
                                 } else if (err.newPassword === "Mật khẩu ít nhất 5 ký tự và nhiều nhất 20 ký tự") {

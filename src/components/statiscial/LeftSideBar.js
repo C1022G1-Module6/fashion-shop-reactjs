@@ -1,13 +1,35 @@
+import { useEffect, useState } from "react";
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
-
+import employeeService from '../../service/employeeService';
+import Swal from "sweetalert2";
 export default function LeftSideBar() {
+    const [detail, setDetail] = useState()
     const navigate = useNavigate()
     const handleLogout = ()=>{
         localStorage.removeItem('token')
-        localStorage.removeItem('avatar')
+        localStorage.removeItem('roles')
+        localStorage.removeItem('name')
         navigate('/')
     }
-    const avatar = localStorage.getItem('avatar')
+    const employeeDetail = async () => {
+        const res = await employeeService.detail()
+        setDetail(res.data)
+    }
+    const handleAuthority = ()=>{
+        Swal.fire({
+            icon: 'error',
+            title: 'Bạn không có quyền truy cập',
+            showConfirmButton: false,
+            timer: 1500
+        })
+    }
+    useEffect(() => {
+        employeeDetail()
+    }, [])
+    if(!detail){
+        return null
+    }
+
     return (
         <>
             <div className="col-3  px-0 fixed-top "
@@ -26,9 +48,12 @@ export default function LeftSideBar() {
                     <hr />
                     <div className="accordion" id="accordionExample">
                         <div className="accordion-item">
-                            <h2 className="accordion-header" id="headingOne">
+                            {
+                                detail?.roleDTOSetSet[0].name === 'ROLE_STORE_MANAGER' 
+                                ?
+                                <h2 className="accordion-header" id="headingOne">
                                 <button
-                                    className="accordion-button fs-5 fw-bold"
+                                    className="accordion-button collapsed fs-5 fw-bold"
                                     type="button"
                                     data-bs-toggle="collapse"
                                     data-bs-target="#collapseOne"
@@ -37,13 +62,22 @@ export default function LeftSideBar() {
                                 >
                                     Quản lý cửa hàng
                                 </button>
+                                </h2>
+                                :
+                                <h2 className="accordion-header" id="headingOne">
+                                <button
+                                    className="accordion-button fs-5 fw-bold collapsed text-muted"
+                                    onClick={handleAuthority}
+                                >
+                                    Quản lý cửa hàng
+                                </button>
                             </h2>
+                            }
                             <div
                                 id="collapseOne"
-                                className="accordion-collapse collapse show"
+                                className="accordion-collapse collapse"
                                 aria-labelledby="headingOne"
-                                data-bs-parent="#accordionExample"
-                            >
+                                data-bs-parent="#accordionExample">
                                 <div className="nav-item">
                                     <a
                                         href="#"
@@ -64,7 +98,7 @@ export default function LeftSideBar() {
                                 </div>
                                 <div className="nav-item ">
                                     <NavLink
-                                        href="#"
+                                        
                                         className="nav-link link-dark  text-truncate"
                                         aria-current="page"
                                     >
@@ -72,20 +106,25 @@ export default function LeftSideBar() {
                                     </NavLink>
                                 </div>
                                 <div className="nav-item ">
-                                    <a
-                                        href="#"
+                                    <NavLink 
+                                        to={'/customer'}
                                         className="nav-link link-dark  text-truncate"
                                         aria-current="page"
                                     >
                                         Quản lý khách hàng
-                                    </a>
+                                    </NavLink>
                                 </div>
                             </div>
                         </div>
                         <div className="accordion-item">
-                            <h2 className="accordion-header" id="headingTwo">
+                            {
+                                detail?.roleDTOSetSet[0].name === 'ROLE_SALER' 
+                                ||
+                                detail?.roleDTOSetSet[0].name === 'ROLE_STORE_MANAGER'
+                                ? 
+                                <h2 className="accordion-header" id="headingTwo">
                                 <button
-                                    className="accordion-button collapsed fs-5 fw-bold"
+                                    className="accordion-button text-truncate collapsed fs-5 fw-bold"
                                     type="button"
                                     data-bs-toggle="collapse"
                                     data-bs-target="#collapseTwo"
@@ -94,7 +133,18 @@ export default function LeftSideBar() {
                                 >
                                     Nhân viên bán hàng
                                 </button>
-                            </h2>
+                            </h2> 
+                            : 
+                                 <h2 className="accordion-header" id="headingTwo">
+                                <button
+                                    className="accordion-button text-muted collapsed fs-5 fw-bold"
+                                    onClick={handleAuthority}
+                                >
+                                    Nhân viên bán hàng
+                                </button>
+                            </h2> 
+                            }
+                            
                             <div
                                 id="collapseTwo"
                                 className="accordion-collapse collapse"
@@ -124,7 +174,7 @@ export default function LeftSideBar() {
                                         className="nav-link link-dark   text-truncate"
                                         aria-current="page"
                                     >
-                                        Lập thống kê bán hàng
+                                        Thống kê
                                     </a>
                                 </div>
                                 <div className="nav-item ">
@@ -133,24 +183,40 @@ export default function LeftSideBar() {
                                         className="nav-link link-dark   text-truncate"
                                         aria-current="page"
                                     >
-                                        Xem thông báo
+                                        Thông báo mới
                                     </a>
                                 </div>
                             </div>
                         </div>
                         <div className="accordion-item">
-                            <h2 className="accordion-header" id="headingThree">
-                                <button
-                                    className="accordion-button collapsed link-dark text-truncate fs-5 fw-bold"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#collapseThree"
-                                    aria-expanded="false"
-                                    aria-controls="collapseThree"
-                                >
-                                    Quản lý kho hàng
-                                </button>
-                            </h2>
+                            {
+                                 detail?.roleDTOSetSet[0].name === 'ROLE_WAREHOUSE_MANAGER' 
+                                 ||
+                                 detail?.roleDTOSetSet[0].name === 'ROLE_STORE_MANAGER'
+                                 ? 
+                                 <h2 className="accordion-header" id="headingThree">
+                                 <button
+                                     className="accordion-button collapsed link-dark text-truncate fs-5 fw-bold"
+                                     type="button"
+                                     data-bs-toggle="collapse"
+                                     data-bs-target="#collapseThree"
+                                     aria-expanded="false"
+                                     aria-controls="collapseThree"
+                                 >
+                                     Quản lý kho hàng
+                                 </button>
+                             </h2>
+                             :
+                             <h2 className="accordion-header" id="headingThree">
+                                 <button
+                                     className="accordion-button collapsed link-dark text-muted fs-5 fw-bold"
+                                     onClick={handleAuthority}
+                                 >
+                                     Quản lý kho hàng
+                                 </button>
+                             </h2>
+                            }
+                            
                             <div
                                 id="collapseThree"
                                 className="accordion-collapse collapse"
@@ -172,7 +238,7 @@ export default function LeftSideBar() {
                                         className="nav-link link-dark text-truncate"
                                         aria-current="page"
                                     >
-                                        Lập phiếu nhập kho
+                                        Nhập liệu
                                     </a>
                                 </div>
                                 <div className="nav-item ">
@@ -181,7 +247,7 @@ export default function LeftSideBar() {
                                         className="nav-link link-dark text-truncate"
                                         aria-current="page"
                                     >
-                                        Lập thống kê nhập hàng
+                                        Thống kê
                                     </a>
                                 </div>
                                 <div className="nav-item ">
@@ -190,7 +256,7 @@ export default function LeftSideBar() {
                                         className="nav-link link-dark text-truncate"
                                         aria-current="page"
                                     >
-                                        Xem thông báo
+                                        Thông báo mới
                                     </a>
                                 </div>
                             </div>
@@ -202,9 +268,9 @@ export default function LeftSideBar() {
                         <nav className="navbar navbar-expand-lg navbar-light bg-white pt-3">
                     {/* Container wrapper */}
                     <div className="container-fluid px-2">
-                        <a className="navbar-brand ms-2 mt-2 mt-lg-0" href="#">
+                        <NavLink to={'/home'} className="navbar-brand ms-2 mt-2 mt-lg-0" href="#">
                             <img src="đ.png" height={40} alt="C10 Logo" loading="lazy" />
-                        </a>
+                        </NavLink>
                         {/* Toggle button */}
                         <button
                             className="navbar-toggler"
@@ -220,10 +286,10 @@ export default function LeftSideBar() {
                     </div>
                     {/* Right elements */}
                     <div className="d-flex align-items-center me-3">
-                        {/* Notifications
-                        <div className="dropdown">
+                        {/* Notifications */}
+                        <div className="dropup">
                             <a
-                                className="text-reset me-3 dropdown-toggle hidden-arrow"
+                                className="text-reset me-1 dropdown-toggle hidden-arrow"
                                 href="#"
                                 id="navbarDropdownMenuLink"
                                 role="button"
@@ -236,7 +302,7 @@ export default function LeftSideBar() {
                                 </span>
                             </a>
                             <ul
-                                className="dropdown-menu dropdown-menu-end"
+                                className="dropdown-menu"
                                 aria-labelledby="navbarDropdownMenuLink"
                             >
                                 <li>
@@ -250,7 +316,7 @@ export default function LeftSideBar() {
                                     </a>
                                 </li>
                             </ul>
-                        </div> */}
+                        </div>
                         {/* Avatar */}
                         <div className="dropup">
                             <a
@@ -261,7 +327,7 @@ export default function LeftSideBar() {
                                 aria-expanded="false"
                             >
                                 <img
-                                    src={avatar}
+                                    src={detail?.avatar}
                                     className="rounded-circle border border-2 border-secondary"
                                     height={35}
                                     alt="avatar"
@@ -269,7 +335,7 @@ export default function LeftSideBar() {
                                 />
                             </a>
                             <ul
-                                className="dropdown-menu dropdown-menu-center"
+                                className="dropdown-menu"
                                 aria-labelledby="navbarDropdownMenuAvatar"
                             >
                                 <li>

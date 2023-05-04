@@ -1,14 +1,44 @@
 import request from "../../request";
 
 export const findAllCustomer = () => {
-    return request.get(`/api/admins/customer`)};
+    const token = localStorage.getItem('token')
+    return request.get(`/api/admins/customer`,{
+        headers:{
+            'Authorization':`Bearer ${token}`
+        }
+    })};
 export const findNumberOfOrder = () => {
-    return request.get(`/api/admins/order`)};
+    const token = localStorage.getItem('token')
+    return request.get(`/api/admins/order`,{
+        headers:{
+            'Authorization':`Bearer ${token}`
+        }
+    })};
 export const findTopEmployees = () => {
-    return request.get(`/api/admins/top-selling`)};
+    const token = localStorage.getItem('token')
+    return request.get(`/api/admins/top-selling`,{
+        headers:{
+            'Authorization':`Bearer ${token}`
+        }
+    })};
 export const findTopProduct = () => {
-    return request.get(`/api/admins/top-order`)};
+    const token = localStorage.getItem('token')
+    return request.get(`/api/admins/top-order`,{
+        headers:{
+            'Authorization':`Bearer ${token}`
+        }
+    })};
 export const findRevenueInWeek = () => {
-    return request.get(`/api/admins/total-week`)};
+    const token = localStorage.getItem('token')
+    return request.get(`/api/admins/total-week`,{
+        headers:{
+            'Authorization':`Bearer ${token}`
+        }
+    })};
 export const findRevenueInMonth = () => {
-    return request.get(`/api/admins/total-month`)};
+    const token = localStorage.getItem('token')
+    return request.get(`/api/admins/total-month`,{
+        headers:{
+            'Authorization':`Bearer ${token}`
+        }
+    })};

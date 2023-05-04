@@ -83,7 +83,7 @@ export default function ManagementPage() {
                                                 <>
                                                     <p style={{fontSize: "xx-large",marginBottom: 1}}
                                                        key={index}>{value.current}</p>
-                                                    <span style={{fontSize: "large"}}>{value.percent} %</span>
+                                                    <span style={{fontSize: "large"}}>{value.percent==null ? 0 :  value.percent}%</span>
                                                     <span
                                                         style={{fontSize: "large"}}> so với tuần trước</span>
                                                 </>
@@ -104,7 +104,7 @@ export default function ManagementPage() {
                                                 <>
                                                     <p style={{fontSize: "xx-large",marginBottom: 1}}
                                                        key={index}>{ol.current}</p>
-                                                    <span style={{fontSize: "large"}}>{ol.percent} %</span>
+                                                    <span style={{fontSize: "large"}}>{ol.percent==null ? 0 :  ol.percent}%</span>
                                                     <span
                                                         style={{fontSize: "large"}}> so với tuần trước</span>
                                                 </>
@@ -159,7 +159,7 @@ export default function ManagementPage() {
                                                 <tbody>
                                                 {employeeList?.map((el,index)=>(
                                                 <tr  key={index}>
-                                                    <td>1</td>
+                                                    <td>{index+1}</td>
                                                     <td>
                                                         <div className="d-flex align-items-center">
                                                             <div>
@@ -189,7 +189,7 @@ export default function ManagementPage() {
                                     className="card card-user-timeline shadow"
                                     style={{marginTop: 24}}
                                 >
-                                    <div className="card-body px-0">
+                                    <div className="card-body px-0 py-0">
                                         <ul className="timeline ms-50 px-0">
                                             <div className="fw-bold fs-5 text-center pt-3 text-white pb-3"
                                             style={{background:'#183661'}}>

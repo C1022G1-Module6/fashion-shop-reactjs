@@ -39,6 +39,7 @@ function Invoice() {
   const [filename, setFileName] = useState("");
 
   const modalContainer = useRef();
+  const employeeName = localStorage.getItem('name')
   const componentBRef = useRef(null);
   const swalWithBootstrapButtons = Swal.mixin({});
 
@@ -104,6 +105,7 @@ function Invoice() {
       discount: discount,
       payment: invoiceFilter.payment,
       customerDTO: { code: customerCode },
+      employeeName: employeeName
     };
     setInvoice(newValues);
   };
@@ -161,8 +163,20 @@ function Invoice() {
       await invoiceDetailService.remove(deletedObject.deletedId);
       const newIsSubmitting = { ...isSubmitting };
       setSubmitting(newIsSubmitting);
+      Swal.fire({
+        icon: 'success',
+        title: 'Xóa thành công',
+        showConfirmButton: false,
+        timer: 1500
+    })
     } catch (error) {
       console.warn(error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Xóa thât bại',
+        showConfirmButton: false,
+        timer: 1500
+    })
     }
   };
 
@@ -185,12 +199,16 @@ function Invoice() {
   // Tính tiền (payment)
   useEffect(() => {
     if (customerCode !== "") {
-      setDiscount(customers[0].customerTypeDTO.discount);
+      for (let customer of customers) {
+        if (customerCode === customer.code) {
+          setDiscount(customer.customerTypeDTO.discount)
+        }
+      }
     }
     const calculatePayment = () => {
       setInvoiceFilter((prev) => ({
         ...prev,
-        payment: invoiceFilter.total - discount,
+        payment: invoiceFilter.total * (100-discount)/100,
       }));
     };
     calculatePayment();
@@ -266,7 +284,6 @@ function Invoice() {
 
   return (
     <>
-      {/* {console.log("abc")} */}
       <Formik
         initialValues={{
           quantity: "",
@@ -274,8 +291,6 @@ function Invoice() {
           productDTO: "",
         }}
         validationSchema={Yup.object({
-          // customerCode: Yup.string().required("Trường này yêu cầu nhập"),
-          // productDTO: Yup.string().required("Trường này yêu cầu nhập"),
           quantity: Yup.string()
             .required("Trường này yêu cầu nhập")
             .matches("^[1-9][\\d]*$", "Số lượng sách phải là số nguyên dương"),
@@ -288,7 +303,7 @@ function Invoice() {
           <div className="row mx-0 ">
             <div className="col-3"></div>
             <div
-              className={`${styles.wrapper} container mt-3 col-12 col-md-10 col-lg-8 col-xxl-6 mb-5`}
+              className={`${styles.wrapper} container mt-3 col-12 col-md-10 col-lg-8 col-xxl-6`}
             >
               <div className={`${styles.content} row`}>
                 <div className="mb-3 text-center row">
@@ -299,7 +314,7 @@ function Invoice() {
                     <label htmlFor="" className="fw-bold">
                       Mã hóa đơn<span className={styles.colon}>:</span>
                     </label>
-                    {isSubmitting ? <span>{invoice.code}</span> : <span></span>}
+                    {isSubmitting ? <span>{invoice?.code}</span> : <span></span>}
                   </div>
                 </div>
                 <div className={`${styles["input-search"]} row mb-3 p-0`}>
@@ -307,7 +322,7 @@ function Invoice() {
                     <label htmlFor="" className="fw-bold">
                       Ngày tháng năm<span className={styles.colon}>:</span>{" "}
                     </label>
-                    {isSubmitting ? <span>{invoice.date}</span> : <span></span>}
+                    {isSubmitting ? <span>{invoice?.date}</span> : <span></span>}
                   </div>
                 </div>
                 <div className={`${styles["input-search"]} row p-0`}>
@@ -507,10 +522,7 @@ function Invoice() {
                   <div className="d-flex justify-content-between">
                     <span className="fw-bold">Giảm giá: </span>
                     <span>
-                      {discount?.toLocaleString("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      })}
+                      {discount}%
                     </span>
                   </div>
                   <div className="d-flex justify-content-between">

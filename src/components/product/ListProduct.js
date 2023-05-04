@@ -27,7 +27,7 @@ function ListProduct() {
     const handleTransferId = (id) => {
         setDetailId(id)
     }
-
+    const role = localStorage.getItem('roles')
     const handleGetListByType = async (e) => {
         // console.log({
         //     name: +e.target.value,page:currentPage
@@ -87,7 +87,7 @@ function ListProduct() {
         <div>
             <div className="row mx-0 ">
                 <div className="col-3"></div>
-                <div className="container mt-4 col-9 pb-5 px-5">
+                <div className="container mt-4 col-9 px-5">
                     <div className="card shadow-lg mx-3 px-3 pt-4 ">
                         <div
                             className="card-header text-white mx-5"
@@ -97,13 +97,21 @@ function ListProduct() {
                         </div>
                         <div className="card-body px-5">
                             <div className="mb-3 d-flex justify-content-between">
-                                <div>
+                                {
+                                    role === 'ROLE_WAREHOUSE_MANAGER' 
+                                    ? 
+                                    <div>
                                     <NavLink to={`/AddNewProduct`}>  <button type="button" className="btn btn-outline-primary w-100">
 
                                         <i className="bi bi-plus-square" /> Thêm mới
                                     </button>
                                     </NavLink>
-                                </div>
+                                    </div> 
+                                    : 
+                                    <div>
+                                    </div>
+                                }
+                                
                                 <select className="form-select w-25" onChange={(e) => handleGetListByType(e)}>
                                     <option value="">--- Chọn thể loại ---</option>
                                     {productTypes.map((type) => (
