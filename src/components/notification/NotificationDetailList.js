@@ -45,10 +45,9 @@ export default function NotificationDetailList() {
                                                          className="input-group input-group-merge">
 
                                                             <h5 style={{marginLeft: "40%"}} className="" ><b>Nội dung chi tiết</b> </h5>
-                                                        <div style={{marginTop: '5%', marginLeft: '-25%'}}>
+                                                       
                                                             <h6  style= {{fontStyle: 'italic', marginTop: '5%', }}>{detail?.content}</h6>
 
-                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
