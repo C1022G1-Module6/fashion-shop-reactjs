@@ -3,8 +3,7 @@ import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 import { useEffect, useState } from "react";
 import LineChart from "./LineChart";
-import { listAll } from "../../service/statistics/statisticsService";
-import { monthRevenue } from "../../service/statistics/statisticsService";
+import { monthRevenue, dayCost, monthCost, listAll } from "../../service/statistics/statisticsService";
 import { Field, Form, Formik } from "formik";
 Chart.register(CategoryScale);
 
@@ -14,9 +13,14 @@ function Statistics() {
 
   const [monthRevenues, setMonthRevenues] = useState('');
 
+  const [dayCosts, setDaycosts] = useState([]);
+
+  const [monthCosts, setMonthCosts] = useState('');
+
   const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
   const [getMonth, setGetMonth] = useState('');
+
   const getStatistics = async () => {
     const statisticsData = await listAll("");
     setStatistics(statisticsData.data);
@@ -28,27 +32,50 @@ function Statistics() {
     setMonthRevenues(monthRevenuesData.data);
 
   };
+
+  const getDayCosts = async () => {
+    const dayCostsData = await dayCost("");
+    setDaycosts(dayCostsData.data);
+
+  };
+
+  const getMonthCosts = async () => {
+    const monthCostsData = await monthCost("");
+    setMonthCosts(monthCostsData.data);
+
+  };
   
   const chartData = {
-    labels: statistics.map((statistic) =>{
-     return "Ngày " + statistic.day
-    }),
+    // labels: statistics.map((statistic) =>{
+    //  return "Ngày " + statistic.day
+    // }),
+
+    labels: dayCosts.map((dayCost) =>{
+      return "Ngày " + dayCost.day
+     }),
     datasets: [
       {
         label: "Doanh thu",
         data: statistics.map((statistic) =>statistic.revenue), 
         backgroundColor: [
-          "rgba(75,192,192,1)",
-          //   "#ecf0f1",
-          //   "#50AF95",
-          //   "#f3ba2f",
-          //   "#2a71d0"
+          "rgba(75,192,192,1)"
         ],
         borderColor: "black",
         borderWidth: 1,
         hoverBorderWidth: 1,
         hoverBorderColor: "#000",
       },
+      {
+        label: "Chi phí",
+        data: dayCosts.map((dayCost) =>dayCost.cost), 
+        backgroundColor: [
+          "rgba(255,159,64,0.6)"
+        ],
+        borderColor: "black",
+        borderWidth: 1,
+        hoverBorderWidth: 1,
+        hoverBorderColor: "#000",
+      }
     ]
   };
   useEffect(() => {
@@ -57,6 +84,14 @@ function Statistics() {
 
   useEffect(() => {
     getMonthRevenues();
+  }, []);
+
+  useEffect(() => {
+    getDayCosts();
+  }, []);
+
+  useEffect(() => {
+    getMonthCosts();
   }, []);
 
   return (
@@ -75,15 +110,17 @@ function Statistics() {
               }}
               onSubmit={(value) => {
                 setGetMonth(value.month);
-                const getStatistics = async () => {
+                const getTotal = async () => {
                   const statisticsData = await listAll(value);
                   const monthRevenuesData = await monthRevenue(value);
-                  console.log(statisticsData.data.filter((a) => a.revenue));
+                  const dayCostsData = await dayCost(value);
+                  const monthCostsData = await monthCost(value);
                   setStatistics(statisticsData.data);
-                  setMonthRevenues(monthRevenuesData.data[0].totalRevenue);
-                  console.log(getMonth)
+                  setMonthRevenues(monthRevenuesData.data.totalRevenue);
+                  setDaycosts(dayCostsData.data);
+                  setMonthCosts(monthCostsData.data.totalCost);
                 };
-                getStatistics();
+                getTotal();
               }}
             >
               <Form className="container-fluid p-0 ">
@@ -111,13 +148,23 @@ function Statistics() {
                 <div className="d-flex justify-content-center">
                   <LineChart chartData={chartData} />
                 </div>
-                <div className="d-flex justify-content-center mt-4 mb-4">
+                <div className="row d-flex justify-content-center">
+                <div className=" mt-4 mb-4 col-6 pe-0">
                   <h5
                     style={{ backgroundColor: "#93D9D9", width: "500px" }}
                     className="text-center pt-2 pb-2"
                   >
                     Tổng doanh thu tháng  { statistics.length!==0 ? <span> {getMonth} : {monthRevenues} VNĐ</span>  : <span> {getMonth} : 0 VNĐ</span>}
                   </h5>
+                </div>
+                <div className=" mt-4 mb-4 col-6 ps-0">
+                  <h5
+                    style={{ backgroundColor: "#FFC58C", width: "500px" }}
+                    className="text-center pt-2 pb-2"
+                  >
+                    Tổng chi phí tháng  { dayCosts.length!==0 ? <span> {getMonth} : {monthCosts} VNĐ</span>  : <span> {getMonth} : 0 VNĐ</span>}
+                  </h5>
+                </div>
                 </div>
                 <div className="text-center">
                   <button

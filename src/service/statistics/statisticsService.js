@@ -16,3 +16,20 @@ export const monthRevenue = ({month}) => {
         console.log(error);
     }
 };
+
+export const dayCost = ({month}) => {
+    try {
+        return request.get(`/statistics/cost?month=${month}`);
+    } catch(error){
+        console.log(error);
+    }
+};
+
+export const monthCost = ({month}) => {
+    console.log(month);
+    try {
+        return request.get(`/statistics/month-cost?month=${month ? month : ''}`);
+    } catch(error){
+        console.log(error);
+    }
+};
