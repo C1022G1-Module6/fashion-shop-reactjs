@@ -360,9 +360,9 @@ export default function ManagementPage() {
                                                 <>
                                                     <p style={{fontSize: "xx-large",marginBottom: 1}}
                                                        key={index}>{value.current}</p>
-                                                    <span style={{fontSize: "large"}}>{value.percent} %</span>
+                                                    <span style={{fontSize: "medium"}}>{value.percent} %</span>
                                                     <span
-                                                        style={{fontSize: "large"}}> so với tuần trước</span>
+                                                        style={{fontSize: "medium"}}> so với tuần trước</span>
                                                 </>
                                             ))
                                         }
@@ -381,9 +381,7 @@ export default function ManagementPage() {
                                                 <>
                                                     <p style={{fontSize: "xx-large",marginBottom: 1}}
                                                        key={index}>{ol.current}</p>
-                                                    <span style={{fontSize: "large"}}>{ol.percent} %</span>
-                                                    <span
-                                                        style={{fontSize: "large"}}> so với tuần trước</span>
+                                                    <span style={{fontSize: "medium"}}>{ol.percent} % so với tuần trước</span>
                                                 </>
                                             ))
                                         }
@@ -476,6 +474,8 @@ export default function ManagementPage() {
                                                 <span className="timeline-point timeline-point-indicator"/>
                                                 <div className="timeline-event">
                                                     <p>{pl.name}</p>
+                                                    <span>Tổng số lượng bán: </span>
+                                                    <span>{pl.quantity} sản phẩm</span>
                                                 </div>
                                             </li>
                                                 ))
