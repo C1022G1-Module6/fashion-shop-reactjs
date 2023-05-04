@@ -60,6 +60,7 @@ export default function ManagementPage() {
                 break;
         }
     },[type]);
+    let stt =1;
     return (
         <>
             <div className="row mx-0">
@@ -432,8 +433,8 @@ export default function ManagementPage() {
                                                 </thead>
                                                 <tbody>
                                                 {employeeList?.map((el,index)=>(
-                                                <tr  key={index}>
-                                                    <td>1</td>
+                                                <tr  >
+                                                    <td>{stt++}</td>
                                                     <td>
                                                         <div className="d-flex align-items-center">
                                                             <div>
@@ -472,10 +473,13 @@ export default function ManagementPage() {
                                                 productList.map((pl,index)=>(
                                             <li className="timeline-item" key={index}>
                                                 <span className="timeline-point timeline-point-indicator"/>
-                                                <div className="timeline-event">
+                                                <div className="timeline-event" style={{marginTop : 9}}>
                                                     <p>{pl.name}</p>
+                                                </div>
+                                                <div style={{marginTop :-16,fontSize: "smaller" }}>
                                                     <span>Tổng số lượng bán: </span>
                                                     <span>{pl.quantity} sản phẩm</span>
+
                                                 </div>
                                             </li>
                                                 ))
