@@ -62,7 +62,7 @@ export default function Notification() {
 
                                         <div className="col-sm-12 col-md-6 col-xl-6 col-xxl-6 col-lg-6" key={index}>
 
-                                            <div className="caxrd h-100" style={{ boxShadow: "8px 8px 16px 8px rgba(0, 0, 0, 0.2)" }}>
+                                            <div className="card h-100" style={{ boxShadow: "8px 8px 16px 8px rgba(0, 0, 0, 0.2)" }}>
 
 
                                                 <img className="card-img-top" src={nitifyList.img} alt="" />
