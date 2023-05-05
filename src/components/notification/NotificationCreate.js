@@ -102,7 +102,7 @@ export default function NotificationCreate() {
                                                                 <i className="bi bi-pencil-square"></i></span>
                                                             <Field type="text" id="fname-icon" className="form-control "
                                                                 name='title'
-                                                                placeholder="Nhập tiêu đề" />
+                                                                placeholder="Vd: Lịch nghỉ lễ 30/4, 1/5" />
 
                                                         </div>
                                                         <div>
@@ -123,7 +123,7 @@ export default function NotificationCreate() {
                                                         <div className="input-group input-group-merge">
                                                             <span className="input-group-text">
                                                                 <i className="bi bi-pen-fill"></i></span>
-                                                            <Field as='textarea' rows='5' cols='100' className="form-control char-textarea"
+                                                            <Field as='textarea' rows='5' placeholder='Vd: Thông báo nghỉ lễ 30/4 1/5' cols='100' className="form-control char-textarea"
                                                                 name='content'
                                                                 style={{
                                                                     boxSizing: '0 0 10px 0',
@@ -145,8 +145,9 @@ export default function NotificationCreate() {
                                                         <label className="col-form-label" htmlFor="hinhAnh"><b>Hình
                                                             ảnh:</b></label>
                                                     </div>
-                                                    <div className="col-9-sm-9-md-9-xl-9-lg-9">
-                                                        <div className="input-group input-group-merge">
+                                                    <div className="colsm-9 col-md-9 col-xl-9 col-lg-9">
+
+                                                        <div className="input-group input-group-merge  ">
                                                             <Field id="hinhAnh" className="form-control" name="img">
                                                                 {
                                                                     ({ field }) => (
@@ -160,11 +161,31 @@ export default function NotificationCreate() {
 
                                                                 }
                                                             </Field>
+                                                            <div className='img' style={{marginLeft: '70%', marginBottom: '1%'}}>
+                                                                {
+                                                                   values.img?.name === undefined ? 
+                                                                   <img style={{ width: "300px", height: '250px' }} src={`../../image/no_img.jpg`} />
+                                                                   :
+                                                                   <img style={{ width: "300px", height: '250px' }} src={`../../image/${values.img?.name}`} name='img' />
 
 
+                                                                        
+                                                
+                                                                }
+
+                                                            </div>
+
+                                     
                                                         </div>
+
+
+
+
+
                                                         <ErrorMessage name='img' className='text-danger'
                                                             component='span' />
+
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -181,7 +202,7 @@ export default function NotificationCreate() {
                                                             htmlFor="validationRadiojq3">Quản lý kho
                                                             hàng</label>
                                                     </div>
-                                                    
+
                                                     <div className="form-check" style={{ marginLeft: '15%' }}>
                                                         <Field type="radio" id="validationRadiojq2" name="employeeDTO"
                                                             className="form-check-input" value='2' />

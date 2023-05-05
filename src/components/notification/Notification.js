@@ -107,10 +107,10 @@ export default function Notification() {
 
 
                            breakLabel="..."
-                           nextLabel=">"
+                           nextLabel="trước"
                            onPageChange={handlePageClick}
                            pageCount={pageCount}
-                           previousLabel="< "
+                           previousLabel="sau"
                            containerClassName="pagination"
                            pageLinkClassName="page-num"
                            nextLinkClassName="page-next"
