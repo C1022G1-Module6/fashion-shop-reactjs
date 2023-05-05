@@ -5,7 +5,7 @@ export const search = (name,page)=>{
     try {
         return request.get(`/api/customer?searchCode=${name}&searchName=${name}&searchPhoneNumber=${name}&page=${page ? page : '0'}`)
     } catch (error) {
-        console.log(error);
+       console.log(error);
     }
 }
 

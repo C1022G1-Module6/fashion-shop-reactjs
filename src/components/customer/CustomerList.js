@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from 'react'
 import {Field, Form, Formik} from 'formik'
-import customerService from "../../service/customer/CustomerService";
+import customerService, {search} from "../../service/customer/CustomerService";
 import customerTypeService from "../../service/customer/CustomerTypeService";
 import ReactPaginate from 'react-paginate';
 import {useNavigate} from 'react-router-dom';
 import CustomerDelete from "./CustomerDelete";
+import './Customer.css';
 
 export default function CustomerList() {
     const [customerList, setCustomerList] = useState([])
@@ -16,12 +17,38 @@ export default function CustomerList() {
     const [deleteId, setDeleteId] = useState(0)
     const [deleteName, setDeleteName] = useState("")
     const navigate = useNavigate();
+    const  [err,setErr] = useState(false)
+        useEffect(() => {
+            document.title = "Danh sách khách hàng"; // Thay đổi title
+        }, []);
+    const search = async (value) => {
+        try {
+            const rs = await customerService.search(value.name, value.page)
+            setCurrentPage(rs.data.number)
+            setCustomerTypeList(value.customerTypeDTO)
+            setName(value.name)
+            const {totalPages} = rs.data;
+            setPageCount(totalPages)
+            setCustomerList(rs.data.content)
+            setCount(Math.ceil(rs.data.size * rs.data.number + 1))
+            console.log(rs)
+        }catch (e) {
+            console.log(e)
+            setErr(true)
+            if (e.response.data===""){
+                document.getElementById("error").innerHTML=`Không tìm thấy tên này ${value.name}`
+            }else {
+                document.getElementById("error").innerHTML=""
+            }
 
-
+        }
+    }
+    useEffect(() => {
+        search()
+    }, [err]);
     const showList = async () => {
         const rs = await customerService.search(name, currentPage)
         setCustomerList(rs.data.content)
-
         const {totalPages} = rs.data;
         setPageCount(totalPages)
     }
@@ -35,6 +62,7 @@ export default function CustomerList() {
     useEffect(() => {
         showList();
         showCustomerType();
+        setErr(false)
     }, []);
 
     const handlePageClick = async (page) => {
@@ -48,23 +76,33 @@ export default function CustomerList() {
         setDeleteId(id);
         setDeleteName(name);
     }
+    // const [isEmpty, setIsEmpty] = useState(false);
+    //
+    // const handleSearch = async (value) => {
+    //     const rs = await customerService.search(value.name, value.page);
+    //     if (rs.data.content.length === 0) {
+    //         setIsEmpty(true);
+    //     } else {
+    //         setIsEmpty(false);
+    //         setCurrentPage(rs.data.number);
+    //         setCustomerTypeList(value.customerTypeDTO);
+    //         setName(value.name);
+    //         const {totalPages} = rs.data;
+    //         setPageCount(totalPages);
+    //         setCustomerList(rs.data.content);
+    //         setCount(Math.ceil(rs.data.size * rs.data.number + 1));
+    //     }
+    // };
+    console.log(customerList)
 
-    // const handleDelete = async (id) => {
-    //     await customerService.deleteCustomer(id)
-    //     alert("Xóa thành công");
-    //     // if (pageCount == pageCount - 1) {
-    //     //     navigate("/")
-    //     //     showList();
-    //     // }
-    //     showList();
-    // }
 
     return (
         <>
-            <div className="container mx-auto my-5" style={{width: "70%"}}>
+
+            <div className="container mx-auto my-5" style={{width: "80%"}}>
                 <div style={{boxShadow: "1px 3px 10px 5px rgba(0, 0, 0, 0.2)"}}>
                     {
-                        customerList !== '' &&
+                        customerList.data !== "" &&
                         <>
                             <div style={{marginBottom: 20}}>
                                 <h2 className="d-flex justify-content-center"
@@ -72,73 +110,86 @@ export default function CustomerList() {
                                     DANH SÁCH KHÁCH HÀNG
                                 </h2>
                             </div>
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="d-flex justify-content-center">
-                                        <table className="table table-striped table-hover" style={{width: "80%"}}>
-                                            <thead>
-                                            <tr>
-                                                <th>STT</th>
-                                                <th>Mã KH</th>
-                                                <th>Tên KH</th>
-                                                <th>Email</th>
-                                                <th>Giới tính</th>
-                                                <th>Điểm</th>
-                                                <th>Bậc</th>
-                                                <th>Chỉnh sửa</th>
-                                                <th>Xoá</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {
-                                                customerList.map((customer, index) => (
-                                                    <tr key={index}>
-                                                        <td>{count++}</td>
-                                                        <td>{customer.code}</td>
-                                                        <td>{customer.name}</td>
-                                                        <td>{customer.email}</td>
-                                                        <td>{customer.gender ? 'Nam' : 'Nữ'}</td>
-                                                        <td>{customer.point}</td>
-                                                        <td>{customer.customerTypeDTO.name}</td>
-                                                        <td>
-                                                            <button type="button" className="btn btn-outline-primary">
-                                                                <i className="bi bi-pencil-square"/>
-                                                            </button>
-                                                        </td>
-                                                        <td>
-                                                            <button type="button" className="btn btn-outline-danger"
-                                                                    onClick={() => getPropsDeleteCustomer(customer.id, customer.name)}
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#deleteCustomer">
-                                                                <i className="bi bi-trash3"/>
-                                                            </button>
-                                                        </td>
+                            {
+                                    err ?
+                                    <h2 id='error' className={'text-center text-danger'}></h2> :
+                                    <>
+                                    <div className="row">
+                                        <div className="col-md-12">
+                                            <div className="d-flex justify-content-center">
+                                                <table className="table table-striped table-hover" style={{width: "85%"}}>
+                                                    <thead>
+                                                    <tr>
+                                                        <th>STT</th>
+                                                        <th>Mã KH</th>
+                                                        <th>Tên KH</th>
+                                                        <th>Email</th>
+                                                        <th>Giới tính</th>
+                                                        <th>Điểm</th>
+                                                        <th>Bậc</th>
+                                                        {/*<th>Chỉnh sửa</th>*/}
+                                                        {/*<th>Xoá</th>*/}
+                                                        <th>Chức năng</th>
                                                     </tr>
-                                                ))
-                                            }
-                                            </tbody>
-                                        </table>
+                                                    </thead>
+                                                    <tbody>
+                                                    {
+                                                        customerList.map((customer, index) => (
+                                                            <tr key={index}>
+                                                                <td>{count++}</td>
+                                                                <td>{customer.code}</td>
+                                                                <td className="text-cut">{customer.name}</td>
+                                                                <td className="text-cut">{customer.email}</td>
+                                                                <td>{customer.gender ? 'Nam' : 'Nữ'}</td>
+                                                                <td>{customer.point}</td>
+                                                                <td>{customer.customerTypeDTO.name}</td>
+                                                                <td className="row">
+                                                                    <div className="col-6">
+                                                                        <button type="button"
+                                                                                className="btn btn-outline-primary">
+                                                                            <i className="bi bi-pencil-square"/>
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="col-6">
+                                                                        <button type="button" className="btn btn-outline-danger"
+                                                                                onClick={() => getPropsDeleteCustomer(customer.id, customer.name)}
+                                                                                data-bs-toggle="modal"
+                                                                                data-bs-target="#deleteCustomer">
+                                                                            <i className="bi bi-trash3"/>
+                                                                        </button>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        ))
+                                                    }
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div className=' d-flex justify-content-center'>
-                                <ReactPaginate
-                                    previousLabel="Trước"
-                                    nextLabel="Sau"
-                                    pageCount={pageCount}
-                                    onPageChange={handlePageClick}
-                                    containerClassName='pagination'
-                                    previousClassName='page-item'
-                                    previousLinkClassName='page-link'
-                                    nextClassName='page-item'
-                                    nextLinkClassName='page-link'
-                                    pageClassName='page-item'
-                                    pageLinkClassName='page-link'
-                                    activeClassName='active'
-                                    activeLinkClassName='page-link'
-                                    forcePage={currentPage}
-                                />
-                            </div>
+                                    <div className=' d-flex justify-content-center'>
+                                        <ReactPaginate
+                                            previousLabel="Trước"
+                                            nextLabel="Sau"
+                                            pageCount={pageCount}
+                                            onPageChange={handlePageClick}
+                                            containerClassName="pagination"
+                                            previousClassName="page-item"
+                                            previousLinkClassName="page-link"
+                                            nextClassName="page-item"
+                                            nextLinkClassName="page-link"
+                                            pageClassName="page-item"
+                                            pageLinkClassName="page-link"
+                                            activeClassName="active"
+                                            activeLinkClassName="page-link"
+                                            forcePage={currentPage}
+                                            pageRangeDisplayed={3} // Hiển thị 3 trang trên mỗi lần render
+                                            marginPagesDisplayed={1} // Hiển thị 1 trang ở đầu và cuối danh sách trang
+                                        />
+                                    </div>
+                                        </>
+                            }
+
                             <div className="row" style={{marginBottom: 50}}>
                                 <div className="col-md-9">
                                     <Formik initialValues={{
@@ -148,39 +199,19 @@ export default function CustomerList() {
                                         page: currentPage
                                     }}
                                             onSubmit={(value) => {
-                                                const showList = async () => {
-                                                    console.log(value.page);
-                                                    const rs = await customerService.search(value.name, value.page)
-                                                    if (rs.data.content === '') {
-                                                        document.getElementById('searchName').innerHTML = 'Không tìm thấy tên ' + value.name
-                                                    } else {
-                                                        document.getElementById('searchName').innerHTML = ''
-                                                    }
-                                                    setCurrentPage(rs.data.number)
-                                                    setCustomerTypeList(value.customerTypeDTO)
-                                                    setName(value.name)
-                                                    const {totalPages} = rs.data;
-                                                    setPageCount(totalPages)
-                                                    setCustomerList(rs.data.content)
-                                                    setCount(Math.ceil(rs.data.size * rs.data.number + 1))
-                                                }
-                                                showList()
+                                                search(value)
                                             }}
                                     >
                                         <Form className="d-flex justify-content-center" role="search"
-                                              style={{marginLeft: 200, marginTop: 25}}>
-                                            <div className="col-md-2">
-                                                <button className="btn btn-outline-secondary" type="submit">
-                                                    <i className="bi bi-search"/>
-                                                </button>
-                                            </div>
-                                            <div className="col-md-10">
-                                                <Field style={{width: "300px"}}
-                                                       type="text"
-                                                       className="form-control float-start w-50"
-                                                       name="name"
-                                                       placeholder="Tìm kiếm..."/>
-                                            </div>
+                                              style={{marginLeft: "200px", marginTop: "25px"}}>
+                                            <button className="btn btn-outline-secondary" type="submit"><i
+                                                className="bi bi-search"/>
+                                            </button>
+                                            <Field style={{width: "90%", marginLeft: "15px"}}
+                                                   type="search"
+                                                   className="form-control float-start"
+                                                   name="name"
+                                                   placeholder="Tìm kiếm mã, tên, số điện thoại"/>
                                         </Form>
                                     </Formik>
                                 </div>

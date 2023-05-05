@@ -1,0 +1,9 @@
+.text-cut {
+    white-space: nowrap; /* Không cho ngắt dòng */
+    overflow: hidden; /* Ẩn phần văn bản bị tràn ra ngoài */
+    text-overflow: ellipsis; /* Thêm ba dấu chấm ở cuối văn bản bị cắt */
+}
+
+th {
+    width: 10%
+}
