@@ -1,15 +1,18 @@
-import request from "../../request";
+import request from "../../request"
 
 const findCustomer = ({ name, page }) => {
-  return request.get(
-    `/api/customer?searchCode=${name ? name : ""}&searchName=${
-      name ? name : ""
-    }&searchPhoneNumber=${name ? name : ""}&page=${page ? page : "0"}`
-  );
-};
+    const token = localStorage.getItem('token')
+    return request.get(`/api/customer?searchCode=${name ? name : ""}&searchName=${
+        name ? name : ""
+      }&searchPhoneNumber=${name ? name : ""}&page=${page ? page : "0"}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+}
 
 const customerForInvoiceService = {
-  findCustomer
-};
+    findCustomer
+}
 
-export default customerForInvoiceService;
+export default customerForInvoiceService

@@ -1,0 +1,38 @@
+.nav-link{
+    padding-left: 24px;
+}
+
+.bx{
+    font-size: 31px;
+}
+
+.bxs-user{
+    color: #183661;
+}
+
+.bxs-pie-chart-alt-2{
+
+    color: #FF6C37;
+}
+.dropdown-item.active{
+    background-color: #183661;
+}
+.dropdown-item:active{
+    background-color: #183661;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #ffffff;
+    background-color: #183661;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+}
+.nav-link:hover{
+    color: #ffffff;
+    background-color: #183661;
+}
+
+
+.accordion-button:not(.collapsed)::after {
+    
+    transform: rotate(-180deg);
+}

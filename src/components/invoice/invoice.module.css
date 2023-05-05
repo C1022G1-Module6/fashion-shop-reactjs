@@ -1,4 +1,4 @@
-body {
+.body {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,7 +63,6 @@ th {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* display: none; */
 }
 
 .modal-container {
@@ -207,7 +206,7 @@ th {
 
 @media print {
   body {
-    zoom: 0.75; /* Giảm tỷ lệ in để tránh vỡ form */
+    zoom: 0.75;
   }
   .container,
   .table-responsive {

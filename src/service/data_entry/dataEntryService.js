@@ -1,17 +1,17 @@
-import request from "../../request"
+import request from "../../request";
 
 const findAll = () => {
     const token = localStorage.getItem('token')
-    return request.get(`/invoice`,{
+    return request.get(`/data-entry`,{
         headers: {
             'Authorization': `Bearer ${token}`
         }
     });
 };
 
-const update = (invoice) => {
+const update = (dataEntry) => {
     const token = localStorage.getItem('token')
-    return request.put(`/invoice`, { ...invoice },{
+    return request.put(`/data-entry`, {...dataEntry},{
         headers: {
             'Authorization': `Bearer ${token}`
         }
@@ -20,27 +20,27 @@ const update = (invoice) => {
 
 const getDetail = () => {
     const token = localStorage.getItem('token')
-    return request.get(`/invoice/detail`,{
+    return request.get(`/data-entry/detail`,{
         headers: {
             'Authorization': `Bearer ${token}`
         }
-    })
-}
+    });
+};
 
 const remove = () => {
     const token = localStorage.getItem('token')
-    return request.delete(`/invoice`,{
+    return request.delete(`/data-entry`,{
         headers: {
             'Authorization': `Bearer ${token}`
         }
     })
 }
 
-const invoiceService = {
+const dataEntryService = {
     findAll,
     update,
     getDetail,
     remove
 };
 
-export default invoiceService;
+export default dataEntryService;
