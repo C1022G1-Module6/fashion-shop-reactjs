@@ -13,3 +13,6 @@ export const findRevenueInWeek = () => {
     return request.get(`/api/admins/total-week`)};
 export const findRevenueInMonth = () => {
     return request.get(`/api/admins/total-month`)};
+
+export const findRevenue = () => {
+    return request.get(`/api/admins/total`)};
