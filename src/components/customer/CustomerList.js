@@ -17,11 +17,14 @@ export default function CustomerList() {
     const [deleteId, setDeleteId] = useState(0)
     const [deleteName, setDeleteName] = useState("")
     const navigate = useNavigate();
-    const  [err,setErr] = useState(false)
-        useEffect(() => {
-            document.title = "Danh sách khách hàng"; // Thay đổi title
-        }, []);
+
+    useEffect(() => {
+        document.title = "Danh sách khách hàng"; // Thay đổi title
+    }, []);
+
     const search = async (value) => {
+        let showTable = document.getElementById("showTable")
+        let errMsg = document.getElementById("error")
         try {
             const rs = await customerService.search(value.name, value.page)
             setCurrentPage(rs.data.number)
@@ -31,21 +34,20 @@ export default function CustomerList() {
             setPageCount(totalPages)
             setCustomerList(rs.data.content)
             setCount(Math.ceil(rs.data.size * rs.data.number + 1))
-            console.log(rs)
-        }catch (e) {
+            showTable.style.display = 'block'
+            errMsg.style.display = 'none'
+        } catch (e) {
             console.log(e)
-            setErr(true)
-            if (e.response.data===""){
-                document.getElementById("error").innerHTML=`Không tìm thấy tên này ${value.name}`
-            }else {
-                document.getElementById("error").innerHTML=""
-            }
-
+            showTable.style.display = 'none'
+            errMsg.innerHTML = "Danh sách trống"
+            errMsg.style.display = 'block'
         }
     }
-    useEffect(() => {
-        search()
-    }, [err]);
+
+    // useEffect(() => {
+    //     search()
+    // }, [err]);
+
     const showList = async () => {
         const rs = await customerService.search(name, currentPage)
         setCustomerList(rs.data.content)
@@ -58,11 +60,9 @@ export default function CustomerList() {
         setCustomerTypeList(rs.data)
     }
 
-    console.log(pageCount)
     useEffect(() => {
         showList();
         showCustomerType();
-        setErr(false)
     }, []);
 
     const handlePageClick = async (page) => {
@@ -110,92 +110,92 @@ export default function CustomerList() {
                                     DANH SÁCH KHÁCH HÀNG
                                 </h2>
                             </div>
-                            {
-                                    err ?
-                                    <h2 id='error' className={'text-center text-danger'}></h2> :
-                                    <>
-                                    <div className="row">
-                                        <div className="col-md-12">
-                                            <div className="d-flex justify-content-center">
-                                                <table className="table table-striped table-hover" style={{width: "85%"}}>
-                                                    <thead>
-                                                    <tr>
-                                                        <th>STT</th>
-                                                        <th>Mã KH</th>
-                                                        <th>Tên KH</th>
-                                                        <th>Email</th>
-                                                        <th>Giới tính</th>
-                                                        <th>Điểm</th>
-                                                        <th>Bậc</th>
-                                                        {/*<th>Chỉnh sửa</th>*/}
-                                                        {/*<th>Xoá</th>*/}
-                                                        <th>Chức năng</th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    {
-                                                        customerList.map((customer, index) => (
-                                                            <tr key={index}>
-                                                                <td>{count++}</td>
-                                                                <td>{customer.code}</td>
-                                                                <td className="text-cut">{customer.name}</td>
-                                                                <td className="text-cut">{customer.email}</td>
-                                                                <td>{customer.gender ? 'Nam' : 'Nữ'}</td>
-                                                                <td>{customer.point}</td>
-                                                                <td>{customer.customerTypeDTO.name}</td>
-                                                                <td className="row">
-                                                                    <div className="col-6">
-                                                                        <button type="button"
-                                                                                className="btn btn-outline-primary">
-                                                                            <i className="bi bi-pencil-square"/>
-                                                                        </button>
-                                                                    </div>
-                                                                    <div className="col-6">
-                                                                        <button type="button" className="btn btn-outline-danger"
-                                                                                onClick={() => getPropsDeleteCustomer(customer.id, customer.name)}
-                                                                                data-bs-toggle="modal"
-                                                                                data-bs-target="#deleteCustomer">
-                                                                            <i className="bi bi-trash3"/>
-                                                                        </button>
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        ))
-                                                    }
-                                                    </tbody>
-                                                </table>
+
+                                    <h2 id='error' className={'text-center text-danger'} style={{display: 'none'}}></h2> :
+                                    <div id='showTable'>
+                                        <div className="row">
+                                            <div className="col-md-12">
+                                                <div className="d-flex justify-content-center">
+                                                    <table className="table table-striped table-hover"
+                                                           style={{width: "85%"}}>
+                                                        <thead>
+                                                        <tr>
+                                                            <th>STT</th>
+                                                            <th>Mã KH</th>
+                                                            <th>Tên KH</th>
+                                                            <th>Email</th>
+                                                            <th>Giới tính</th>
+                                                            <th>Điểm</th>
+                                                            <th>Bậc</th>
+                                                            {/*<th>Chỉnh sửa</th>*/}
+                                                            {/*<th>Xoá</th>*/}
+                                                            <th>Chức năng</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {
+                                                            customerList.map((customer, index) => (
+                                                                <tr key={index}>
+                                                                    <td>{count++}</td>
+                                                                    <td>{customer.code}</td>
+                                                                    <td className="text-cut">{customer.name}</td>
+                                                                    <td className="text-cut">{customer.email}</td>
+                                                                    <td>{customer.gender ? 'Nam' : 'Nữ'}</td>
+                                                                    <td>{customer.point}</td>
+                                                                    <td>{customer.customerTypeDTO.name}</td>
+                                                                    <td className="row">
+                                                                        <div className="col-6">
+                                                                            <button type="button"
+                                                                                    className="btn btn-outline-primary">
+                                                                                <i className="bi bi-pencil-square"/>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div className="col-6">
+                                                                            <button type="button"
+                                                                                    className="btn btn-outline-danger"
+                                                                                    onClick={() => getPropsDeleteCustomer(customer.id, customer.name)}
+                                                                                    data-bs-toggle="modal"
+                                                                                    data-bs-target="#deleteCustomer">
+                                                                                <i className="bi bi-trash3"/>
+                                                                            </button>
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            ))
+                                                        }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
+                                        <div className=' d-flex justify-content-center'>
+                                            <ReactPaginate
+                                                previousLabel="Trước"
+                                                nextLabel="Sau"
+                                                pageCount={pageCount}
+                                                onPageChange={handlePageClick}
+                                                containerClassName="pagination"
+                                                previousClassName="page-item"
+                                                previousLinkClassName="page-link"
+                                                nextClassName="page-item"
+                                                nextLinkClassName="page-link"
+                                                pageClassName="page-item"
+                                                pageLinkClassName="page-link"
+                                                activeClassName="active"
+                                                activeLinkClassName="page-link"
+                                                forcePage={currentPage}
+                                                pageRangeDisplayed={3} // Hiển thị 3 trang trên mỗi lần render
+                                                marginPagesDisplayed={1} // Hiển thị 1 trang ở đầu và cuối danh sách trang
+                                            />
+                                        </div>
                                     </div>
-                                    <div className=' d-flex justify-content-center'>
-                                        <ReactPaginate
-                                            previousLabel="Trước"
-                                            nextLabel="Sau"
-                                            pageCount={pageCount}
-                                            onPageChange={handlePageClick}
-                                            containerClassName="pagination"
-                                            previousClassName="page-item"
-                                            previousLinkClassName="page-link"
-                                            nextClassName="page-item"
-                                            nextLinkClassName="page-link"
-                                            pageClassName="page-item"
-                                            pageLinkClassName="page-link"
-                                            activeClassName="active"
-                                            activeLinkClassName="page-link"
-                                            forcePage={currentPage}
-                                            pageRangeDisplayed={3} // Hiển thị 3 trang trên mỗi lần render
-                                            marginPagesDisplayed={1} // Hiển thị 1 trang ở đầu và cuối danh sách trang
-                                        />
-                                    </div>
-                                        </>
-                            }
+
 
                             <div className="row" style={{marginBottom: 50}}>
                                 <div className="col-md-9">
-                                    <Formik initialValues={{
-                                        code: '',
+                                    <Formik
+                                        initialValues={{
                                         name: '',
-                                        phoneNumber: '',
                                         page: currentPage
                                     }}
                                             onSubmit={(value) => {
