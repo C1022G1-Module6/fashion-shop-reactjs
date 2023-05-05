@@ -9,8 +9,8 @@ function App() {
   return (
     <Routes>
       <Route path='/' element={<Login />} />
-      <Route path='/create' element={<CreateCustomer />} />
-      <Route path='/edit' element={<EditCustomer />} />
+      <Route path='customer/create' element={<CreateCustomer />} />
+      <Route path='customer/edit/:id' element={<EditCustomer />} />
     </Routes>
   );
 }

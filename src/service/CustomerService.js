@@ -1,11 +1,11 @@
-import axios from "axios";
+
 import request from "../request";
 
 
 
 export const saveCustomer = async (customer) => {
     try{
-        await axios.post(`/api/customer/create`,{...customer})
+       return await request.post(`/api/customer/create`,{...customer})
     }
     catch(err){
         console.log(err);
@@ -13,9 +13,12 @@ export const saveCustomer = async (customer) => {
 }
 
 export const findCustomerById = async (id) => {
+    console.log(id);
     try{
-        const res = await axios.get(`/api/customer/${id}`)
+        const res = await request.get(`/api/customer/${id}`)
+        console.log(res.data);
         return res.data
+       
     }
     catch(err){
         console.log(err);
@@ -23,8 +26,9 @@ export const findCustomerById = async (id) => {
 }
 
 export const editCustomer = async (customer) => {
+    console.log(customer);
     try {
-        await axios.put(`/api/customer/update/${customer.id}`, { ...customer })
+        await request.patch(`/api/customer/update/${customer.id}`, { ...customer })
     } catch (err) {
         console.log(err);
     }
