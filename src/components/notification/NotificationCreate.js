@@ -181,13 +181,7 @@ export default function NotificationCreate() {
                                                             htmlFor="validationRadiojq3">Quản lý kho
                                                             hàng</label>
                                                     </div>
-                                                    <div className="form-check" style={{ marginLeft: '15%' }}>
-                                                        <Field type="radio" id="validationRadiojq21" name="employeeDTO"
-                                                            className="form-check-input" value='1' />
-                                                        <label className="form-check-label"
-                                                            htmlFor="validationRadiojq1">Quản lý cửa
-                                                            hàng</label>
-                                                    </div>
+                                                    
                                                     <div className="form-check" style={{ marginLeft: '15%' }}>
                                                         <Field type="radio" id="validationRadiojq2" name="employeeDTO"
                                                             className="form-check-input" value='2' />
