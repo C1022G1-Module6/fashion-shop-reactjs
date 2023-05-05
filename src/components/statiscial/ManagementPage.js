@@ -26,10 +26,12 @@ export default function ManagementPage() {
             }
             const listEmployees = async () => {
                 const rs = await findTopEmployees();
+
                 setEmployeeList(rs.data);
             }
             const listProduct = async () => {
                 const rs = await findTopProduct();
+
                 setProductList(rs.data);
             }
             const revenue = async () => {
@@ -369,7 +371,7 @@ export default function ManagementPage() {
                                                 <>
                                                     <p style={{fontSize: "xx-large",marginBottom: 1}}
                                                        key={index}>{value.current}</p>
-                                                    <span style={{fontSize: "medium"}}>tăng {value.percent} %</span>
+                                                    <span style={{fontSize: "medium"}}>{value.percent > 0 ? " tăng " : " giảm "}{value.percent} %</span>
                                                     <span
                                                         style={{fontSize: "medium"}}> so với tuần trước</span>
                                                 </>
@@ -390,7 +392,8 @@ export default function ManagementPage() {
                                                 <div>
                                                     <p style={{fontSize: "xx-large",marginBottom: 1}}
                                                        key={index}>{ol.current}</p>
-                                                    <span style={{fontSize: "medium"}}>tăng {ol.percent} % so với tuần trước</span>
+                                                    <span style={{fontSize: "medium"}}> {ol.percent > 0 ? " tăng " : " giảm "}
+                                                        {ol.percent} % so với tuần trước</span>
                                                 </div>
                                             ))
                                         }
@@ -407,9 +410,7 @@ export default function ManagementPage() {
                                             <div className="col-6">
                                                 <select onChange={handleChange}
                                                         aria-label="Default select example"
-                                                        style={{width: 98,height:24}}
-                                                >
-
+                                                        style={{width: 98,height:24}}>
                                                     <option value={1}>Tuần này</option>
                                                     <option value={2}>Tháng này</option>
                                                 </select>
@@ -436,10 +437,13 @@ export default function ManagementPage() {
                             <div className="col-xs-12">
                                 <div className="card card-company-table shadow">
                                     <div className="card-body p-0">
-                                        <div className="table-responsive">
+
                                             <div className="fw-bold fs-5 text-center pt-3">
-                                                Top 5 nhân viên bán hàng tốt nhất theo quý
+                                                Top 5 nhân viên bán hàng tốt nhất theo {employeeList[4]?.quarter}
                                             </div>
+
+
+                                        <div className="table-responsive">
                                             <table className="table align-middle mb-0 bg-white ">
                                                 <thead className="bg-light">
                                                 <tr>
@@ -488,7 +492,7 @@ export default function ManagementPage() {
                                     <div className="card-body ">
                                         <ul className="timeline ms-50">
                                             <div className="fw-bold fs-5 text-center pt-3">
-                                                Top 5 mặt hàng bán chạy nhất theo quý
+                                                Top 5 mặt hàng bán chạy nhất theo quý {productList[4]?.quarter}
                                             </div>
                                             {
                                                 productList.map((pl,index)=>(
