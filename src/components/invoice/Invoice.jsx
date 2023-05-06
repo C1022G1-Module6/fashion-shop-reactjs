@@ -7,12 +7,13 @@ import invoiceDetailService from "../../service/invoice/invoiceDetailService";
 import invoiceService from "../../service/invoice/invoiceService";
 import customerForInvoiceService from "../../service/customer/customerForInvoiceService";
 import productService from "../../service/product/productService";
+import productSizeService from "../../service/product/productSizeService";
 import ReactPaginate from "react-paginate";
 import Swal from "sweetalert2";
 import InvoicePDF from "./InvoicePDF";
 import { useReactToPrint } from "react-to-print";
 import * as Yup from "yup";
-import productSizeService from "../../service/product/productSizeService";
+import { usePrompt } from "../../hooks/usePrompt";
 
 function Invoice() {
   const [showModal, setShowModal] = useState(false);
@@ -44,6 +45,9 @@ function Invoice() {
     total: 0,
     payment: 0,
   });
+  const [formDirty, setFormDirty] = useState(true);
+  const [selectedId, setSelectedId] = useState(null);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
   const modalContainer = useRef();
   const employeeName = localStorage.getItem("name");
@@ -69,6 +73,7 @@ function Invoice() {
   };
 
   const setProductValue = (e) => {
+    setFormDirty(!e.target.value);
     setFileName(e.target.value);
   };
 
@@ -87,24 +92,29 @@ function Invoice() {
 
   const handleTransferCustomerCode = (id, code) => {
     const tr = document.querySelector(`.tr${id}`);
-    if (tr.classList.contains(styles.color)) {
+    if (selectedId === id) {
       tr.classList.remove(styles.color);
+      setSelectedId(null);
       setCustomerCode("");
       setDiscount(0);
-    } else {
+    } else if (!selectedId) {
       tr.classList.add(styles.color);
+      setSelectedId(id);
       setCustomerCode(code);
     }
   };
 
   const handleTransferProductCode = (id, code) => {
-    const tr = document.querySelector(`.tr${id}`);
-    if (tr.classList.contains(styles.color)) {
+    const tr = document.querySelector(`.product-tr${id}`);
+    if (selectedProductId === id) {
       tr.classList.remove(styles.color);
       setFileName("");
-    } else {
+      setSelectedProductId(null);
+    } else if (!selectedProductId) {
       tr.classList.add(styles.color);
+      setFormDirty(!code);
       setFileName(code);
+      setSelectedProductId(id);
     }
   };
 
@@ -118,7 +128,7 @@ function Invoice() {
 
   const handlePageProductClick = (event) => {
     setProductFilter((prev) => ({ ...prev, page: event.selected }));
-  }
+  };
 
   const handleTransferInfoToModal = () => {
     let newValues = {
@@ -133,6 +143,7 @@ function Invoice() {
   };
 
   const handleResetInvoice = () => {
+    setFormDirty(true);
     invoiceService.remove();
     resetValue();
   };
@@ -140,6 +151,7 @@ function Invoice() {
   const handleSubmitInvoiceDetail = async (values) => {
     let errorQuantityMsg = document.getElementById("error-quantity");
     let errProductCode = document.getElementById("error-product-code");
+    let errorSize = document.getElementById("error-size");
     let newValues = {
       ...values,
       productDTO: { code: filename },
@@ -155,15 +167,18 @@ function Invoice() {
       }
       errorQuantityMsg.style.display = "none";
       errProductCode.style.display = "none";
+      errorSize.style.display = "none";
     } catch (error) {
       if (typeof error.response.data === "object") {
         errorQuantityMsg.innerHTML = "Số lượng nhập quá lớn";
       } else if (error.response.data === "Không được bỏ trống") {
         errProductCode.style.display = "block";
         errorQuantityMsg.style.display = "block";
+        errorSize.style.display = "block";
         errProductCode.innerHTML = error.response.data;
         errorQuantityMsg.innerHTML = error.response.data;
-      } else if (error.response.data === "Không có mặt hàng này trong kho") {
+        errorSize.innerHTML = error.response.data;
+      } else if (error.response.data === "Không có hàng này trong kho") {
         errProductCode.style.display = "block";
         errProductCode.innerHTML = error.response.data;
       } else {
@@ -175,6 +190,7 @@ function Invoice() {
   };
 
   const handleSubmitInvoice = async () => {
+    let customerErr = document.getElementById("customer-error");
     try {
       await invoiceService.update(invoice);
       handlePrint();
@@ -185,10 +201,11 @@ function Invoice() {
         timer: 1500,
       });
       resetValue();
+      setFormDirty(true);
+      customerErr.innerHTML = "";
     } catch (error) {
-      let customerErr = document.getElementById("customer-error");
       customerErr.innerHTML = error.response.data;
-      swalWithBootstrapButtons.fire("Hủy", "Lỗi in :)", "error");
+      swalWithBootstrapButtons.fire("In thất bại", "Lỗi in :)", "error");
       console.warn(error);
     }
   };
@@ -314,7 +331,25 @@ function Invoice() {
     getCustomers();
   }, [customerFilter]);
 
-  // Lấy lại mảng sau khi tắt modal
+  // Lấy mảng products
+  useEffect(() => {
+    const getProducts = async () => {
+      const productList = document.getElementById("product-list");
+      try {
+        const productsResponse = await productService.search(productFilter);
+        setProducts(productsResponse.data.content);
+        setProductPageCount(productsResponse.data.totalPages);
+        productList.style.display = "none";
+      } catch (error) {
+        products.style.display = "block";
+        setProducts([]);
+        console.warn(error);
+      }
+    };
+    getProducts();
+  }, [productFilter]);
+
+  // Lấy lại mảng khách hàng sau khi tắt modal
   useEffect(() => {
     if (!showModal) {
       setCustomerFilter({
@@ -323,6 +358,16 @@ function Invoice() {
       });
     }
   }, [showModal]);
+
+  // Lấy lại mảng hàng hóa sau khi tắt modal
+  useEffect(() => {
+    if (!selectedProductId) {
+      setProductFilter({
+        name: "",
+        page: 0,
+      });
+    }
+  }, [selectedProductId]);
 
   // Lấy giá trị của mã KH sau khi chọn
   useEffect(() => {
@@ -341,19 +386,10 @@ function Invoice() {
     getProductSizes();
   }, []);
 
-  // Lấy mảng products
-  useEffect(() => {
-    const getProducts = async () => {
-      try {
-        const productsResponse = await productService.search(productFilter);
-        setProducts(productsResponse.data.content);
-        setProductPageCount(productsResponse.data.totalPages);
-      } catch (error) {
-        console.warn(error);
-      }
-    };
-    getProducts();
-  }, [productFilter]);
+  usePrompt(
+    "Bạn có chắc rằng muốn thoát, những thay đổi sẽ không được lưu lại!",
+    !formDirty
+  );
 
   return (
     <>
@@ -367,10 +403,11 @@ function Invoice() {
         validationSchema={Yup.object({
           quantity: Yup.string().matches(
             "^[1-9][\\d]*$",
-            "Số lượng sách phải là số nguyên dương"
+            "Số lượng là số nguyên dương"
           ),
         })}
         onSubmit={(values, { resetForm }) => {
+          console.log(values);
           handleSubmitInvoiceDetail(values);
           resetForm();
         }}
@@ -426,7 +463,7 @@ function Invoice() {
                         onChange={(e) => resetCustomerValue(e)}
                       />
                       <span
-                        className="text-danger mx-4"
+                        className="text-danger mx-3"
                         id="customer-error"
                       ></span>
                     </div>
@@ -452,16 +489,6 @@ function Invoice() {
                       <span className={styles.colon}>:</span>
                     </legend>
                     <div className={`row ${styles["input-search"]}`}>
-                      <label className="col-4 col-lg-3 fw-bold"></label>
-                      <div className="col-6 col-lg-8 d-flex justify-content-center">
-                        <span
-                          id="error-product-code"
-                          className="text-danger"
-                          style={{ display: "none" }}
-                        ></span>
-                      </div>
-                    </div>
-                    <div className={`row ${styles["input-search"]}`}>
                       <label
                         htmlFor="product-code"
                         className="col-4 col-lg-3 fw-bold"
@@ -469,17 +496,22 @@ function Invoice() {
                         Mã hàng<span className="text-danger">*</span>{" "}
                         <span className={styles.colon}>:</span>{" "}
                       </label>
-                      <div className="col-6 col-lg-8 px-0">
-                        <Field
-                          type="text"
-                          className={`${styles["customer-input"]} ${styles["input_field"]} mx-0`}
-                          style={{ marginLeft: 8, width: "55%" }}
-                          id="product-code"
-                          name="productDTO"
-                          value={filename}
-                          onChange={(e) => setProductValue(e)}
-                        />
-
+                      <div className="col-6 col-lg-8 px-0 d-flex justify-content-between">
+                        <div className="d-flex flex-column justify-content-center">
+                          <Field
+                            type="text"
+                            className={`${styles["customer-input"]} ${styles["input_field"]} mx-0 w-100`}
+                            id="product-code"
+                            name="productDTO"
+                            value={filename}
+                            onChange={(e) => setProductValue(e)}
+                          />
+                          <span
+                            className="text-danger mx-3"
+                            id="error-product-code"
+                            style={{ display: "none" }}
+                          ></span>
+                        </div>
                         <button
                           type="button"
                           className="btn btn-primary"
@@ -489,6 +521,7 @@ function Invoice() {
                             width: "40%",
                             marginLeft: "22px",
                             marginBottom: "6px",
+                            height: "50%",
                           }}
                         >
                           <i className="bi bi-search" />{" "}
@@ -551,6 +584,16 @@ function Invoice() {
                           </option>
                         ))}
                       </Field>
+                    </div>
+                    <div className={`row ${styles["input-search"]}`}>
+                      <label className="col-4 col-lg-3 fw-bold"></label>
+                      <div className="col-6 col-lg-8 d-flex justify-content-center">
+                        <span
+                          id="error-size"
+                          className="text-danger"
+                          style={{ display: "none" }}
+                        ></span>
+                      </div>
                     </div>
                     <div className={`row mt-3 ${styles["input-search"]}`}>
                       <label className="col-4 col-lg-3 fw-bold"></label>
@@ -762,7 +805,10 @@ function Invoice() {
                       <button
                         className="btn btn-primary"
                         style={{ height: "39px" }}
-                        onClick={() => setShowModal(false)}
+                        onClick={() => {
+                          setShowModal(false);
+                          setSelectedId(null);
+                        }}
                       >
                         Chọn
                       </button>
@@ -881,18 +927,21 @@ function Invoice() {
         </div>
       </div>
 
-      {/* {modal-product-search} */}              
-      <div
-        className="modal fade"
-        id="exampleModal2"
-      >
+      {/* {modal-product-search} */}
+      <div className="modal fade" id="exampleModal2">
         <div className="row">
           <div className="col-3"></div>
-          <div className="modal-dialog col-9" style={{marginTop: '100px', maxWidth: "800px"}}>
-            <div className="modal-content" style={{position: 'relatative'}}>
-              <div className="modal-header justify-content-center" style={{background: "#183661"}}>
+          <div
+            className="modal-dialog col-9"
+            style={{ marginTop: "100px", maxWidth: "800px" }}
+          >
+            <div className="modal-content" style={{ position: "relatative" }}>
+              <div
+                className="modal-header justify-content-center"
+                style={{ background: "#183661" }}
+              >
                 <h2 className="modal-title text-white" id="exampleModalLabel">
-                 TRA CỨU HÀNG HÓA
+                  TRA CỨU HÀNG HÓA
                 </h2>
                 <button
                   type="button"
@@ -900,124 +949,124 @@ function Invoice() {
                   data-bs-dismiss="modal"
                   aria-label="Close"
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 0,
-                    right: 0
+                    right: 0,
                   }}
                 ></button>
               </div>
               <div className={styles["modal-body"]}>
-              <div className="container" style={{ boxShadow: "none" }}>
-                <div className={`${styles.content} row`}>
-                  <div className="col-12">
-                    <div className="d-flex justify-content-between">
-                      <Formik
-                        initialValues={{
-                          name: productFilter.name,
-                        }}
-                        onSubmit={(values) => {
-                          setProductFilter((prev) => {
-                            return { ...prev, ...values, page: 0 };
-                          });
-                        }}
-                      >
-                        <Form>
-                          <div
-                            className={`${styles["input-search"]} mb-3 d-flex justify-content-between`}
-                          >
-                            <Field
-                              type="text"
-                              className={`${styles["customer-info-input"]} ${styles["input_field"]}`}
-                              placeholder="Nhập mã KH, tên KH hoặc SĐT"
-                              name="name"
-                            />
-                            <div>
-                              <button
-                                type="submit"
-                                className="btn btn-outline-primary me-2"
-                              >
-                                <i className="bi bi-search" />
-                              </button>
+                <div className="container" style={{ boxShadow: "none" }}>
+                  <div className={`${styles.content} row`}>
+                    <div className="col-12">
+                      <div className="d-flex justify-content-between">
+                        <Formik
+                          initialValues={{
+                            name: productFilter.name,
+                          }}
+                          onSubmit={(values) => {
+                            setProductFilter((prev) => {
+                              return { ...prev, ...values, page: 0 };
+                            });
+                          }}
+                        >
+                          <Form>
+                            <div
+                              className={`${styles["input-search"]} mb-3 d-flex justify-content-between`}
+                            >
+                              <Field
+                                type="text"
+                                className={`${styles["customer-info-input"]} ${styles["input_field"]}`}
+                                placeholder="Nhập mã hoặc tên hàng hóa"
+                                name="name"
+                              />
+                              <div>
+                                <button
+                                  type="submit"
+                                  className="btn btn-outline-primary me-2"
+                                >
+                                  <i className="bi bi-search" />
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        </Form>
-                      </Formik>
+                          </Form>
+                        </Formik>
 
-                      <button
-                        className="btn btn-primary"
-                        style={{ height: "39px" }}
-                        onClick={() => setShowModal(false)}
-                        data-bs-dismiss="modal"
-                      >
-                        Chọn
-                      </button>
-                    </div>
+                        <button
+                          className="btn btn-primary"
+                          style={{ height: "39px" }}
+                          data-bs-dismiss="modal"
+                          onClick={() => setSelectedProductId(null)}
+                        >
+                          Chọn
+                        </button>
+                      </div>
 
-                    <div className="mb-3">
-                      <div className="table-responsive p-0">
-                        <table className="table">
-                          <thead>
-                            <tr>
-                              <th>STT</th>
-                              <th>Mã hàng hóa</th>
-                              <th>Tên hàng hóa</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {products.map((product, index) => (
-                              <tr
-                                className={`tr${product.id}`}
-                                key={index}
-                                onClick={() =>
-                                  handleTransferProductCode(
-                                    product.id,
-                                    product.code
-                                  )
-                                }
-                              >
-                                <td>{++index}</td>
-                                <td>{product.code}</td>
-                                <td>{product.name}</td>
+                      <div className="mb-3">
+                        <div className="table-responsive p-0">
+                          <table className="table">
+                            <thead>
+                              <tr>
+                                <th>STT</th>
+                                <th>Mã hàng hóa</th>
+                                <th>Tên hàng hóa</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                        <div id="product-list" style={{ display: "none" }}>
-                          <span className="text-danger">
-                            Không tìm thấy hàng hóa
-                          </span>
+                            </thead>
+                            <tbody>
+                              {products.map((product, index) => (
+                                <tr
+                                  className={`product-tr${product.id}`}
+                                  key={index}
+                                  onClick={() =>
+                                    handleTransferProductCode(
+                                      product.id,
+                                      product.code
+                                    )
+                                  }
+                                >
+                                  <td>{++index}</td>
+                                  <td>{product.code}</td>
+                                  <td>{product.name}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <div id="product-list" style={{ display: "none" }}>
+                            <span className="text-danger">
+                              Không tìm thấy hàng hóa
+                            </span>
+                          </div>
                         </div>
                       </div>
+                      <div />
+                      {products.length === 0 ? (
+                        <div></div>
+                      ) : (
+                        <div className="d-grid">
+                          <ReactPaginate
+                            breakLabel="..."
+                            nextLabel="Sau"
+                            onPageChange={handlePageProductClick}
+                            pageCount={pageProductCount}
+                            pageRangeDisplayed={2}
+                            marginPagesDisplayed={1}
+                            previousLabel="Trước"
+                            containerClassName={styles.pagination}
+                            pageClassName="page-item"
+                            pageLinkClassName="page-link"
+                            nextClassName="page-item"
+                            nextLinkClassName="page-link"
+                            previousClassName="page-item"
+                            previousLinkClassName="page-link"
+                            activeClassName="active"
+                            disabledClassName="d-none"
+                          />
+                        </div>
+                      )}
                     </div>
-                    <div />
-                    {products.length === 0 ? (
-                      <div></div>
-                    ) : (
-                      <div className="d-grid">
-                        <ReactPaginate
-                          breakLabel="..."
-                          nextLabel="Sau"
-                          onPageChange={handlePageProductClick}
-                          pageCount={pageProductCount}
-                          pageRangeDisplayed={2}
-                          marginPagesDisplayed={1}
-                          previousLabel="Trước"
-                          containerClassName={styles.pagination}
-                          pageClassName="page-item"
-                          pageLinkClassName="page-link"
-                          nextClassName="page-item"
-                          nextLinkClassName="page-link"
-                          previousClassName="page-item"
-                          previousLinkClassName="page-link"
-                          activeClassName="active"
-                          disabledClassName="d-none"
-                        />
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
-            </div>
             </div>
           </div>
         </div>
