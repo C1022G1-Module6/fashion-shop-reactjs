@@ -42,3 +42,12 @@ export const findRevenueInMonth = () => {
             'Authorization':`Bearer ${token}`
         }
     })};
+
+    
+export const findRevenue = () => {
+    const token = localStorage.getItem('token')
+    return request.get(`/api/admins/total`,{
+        headers:{
+            'Authorization':`Bearer ${token}`
+        }
+    })};

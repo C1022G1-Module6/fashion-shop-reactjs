@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 
 
 import { ErrorMessage, Field, Form, Formik } from "formik";
@@ -17,6 +18,9 @@ export default function Login() {
     const [submit, setSubmit] = useState(false)
     const [countdown, setCountdown] = useState(0);
     const navigate = useNavigate()
+    useEffect(() => {
+        document.title = "Đăng Nhập"; // Thay đổi title
+    }, [])
     const handleShowFromEmail = () => {
         setShowFormEmail(true)
     }
@@ -140,7 +144,7 @@ export default function Login() {
                                                             type="text"
                                                             id="form2Example11"
                                                             className="form-control"
-                                                            placeholder="Nhập tên đăng nhập..."
+                                                            placeholder="Nhập tài khoản của bạn"
                                                             name="username"
                                                         />
                                                     </div>
@@ -160,7 +164,7 @@ export default function Login() {
                                                             type="password"
                                                             id="form2Example22"
                                                             className="form-control"
-                                                            placeholder="Nhập mật khẩu..."
+                                                            placeholder="Nhập mật khẩu của bạn"
                                                             name="password"
                                                         />
                                                     </div>
@@ -177,12 +181,7 @@ export default function Login() {
                                                         </button>
                                                     </div>
                                                     <div className="text-center">
-                                                        <a type="button"
-                                                            // data-bs-toggle="modal"
-                                                            className={`text-muted ${loginStyle.bgForgotPassword}`}
-                                                            // href="#exampleModal"
-                                                            onClick={handleShowFromEmail}
-                                                        >
+                                                        <a type="button" className={`text-muted ${loginStyle.bgForgotPassword}`}onClick={handleShowFromEmail}>
                                                             Quên mật khẩu?
                                                         </a>
                                                     </div>
@@ -364,9 +363,10 @@ export default function Login() {
                                                     <span className="text-danger" id="codeErr"></span>
                                                     {
                                                         countdown === 0 ?
+                                                            // eslint-disable-next-line react/jsx-no-comment-textnodes
                                                             <div className="mt-2">
+                                                                // eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/anchor-is-valid
                                                                 <a className="float-end text-black text-decoration-none  bg-forgot-password"
-                                                                    href="#"
                                                                     onClick={handleAgainSendCode}>Gửi lại mã</a>
                                                             </div>
                                                             :

@@ -17,6 +17,9 @@ export default function EmployeeDetail() {
         setDetail(res.data)
     }
     useEffect(() => {
+        document.title = "Thông Tin Cá Nhân"; // Thay đổi title
+    }, [])
+    useEffect(() => {
         employeeDetail()
     }, [])
     const handleLogout = () => {

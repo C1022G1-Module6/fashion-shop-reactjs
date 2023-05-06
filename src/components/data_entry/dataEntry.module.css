@@ -53,5 +53,14 @@
     background-color: transparent;
   }
   
+  .pagination {
+    list-style: none;
+    display: flex;
+    justify-self: center;
+    align-items: center;
+    font-size: 1.2rem;
+    gap: 5px;
+    margin-top: 20px;
+  }
   
   

@@ -3,7 +3,7 @@ import Chart from "chart.js/auto";
 import { CategoryScale } from "chart.js";
 import { useEffect, useState } from "react";
 import LineChart from "./LineChart";
-import { monthRevenue, dayCost, monthCost, listAll } from "../../service/statistics/statisticsService";
+import { monthRevenue, dayCost, monthCost, listAll, dayProfit, monthProfit } from "../../service/statistics/statisticsService";
 import { Field, Form, Formik } from "formik";
 import { useReactToPrint } from "react-to-print";
 import { useRef } from "react";
@@ -13,15 +13,20 @@ Chart.register(CategoryScale);
 function Statistics() {
     const [statistics, setStatistics] = useState([]);
 
-    const [monthRevenues, setMonthRevenues] = useState(0);
+    const [monthRevenues, setMonthRevenues] = useState('');
 
-    const [dayCosts, setDaycosts] = useState([]);
+    const [dayCosts, setDayCosts] = useState([]);
 
-    const [monthCosts, setMonthCosts] = useState(0);
+    const [monthCosts, setMonthCosts] = useState('');
+
+    const [dayProfits, setDayProfits] = useState([]);
+
+    const [monthProfits, setMonthProfits] = useState('');
 
     const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
     const [getMonth, setGetMonth] = useState('');
+
     const componentBRef = useRef(null);
 
     const handlePrint = useReactToPrint({
@@ -55,6 +60,17 @@ function Statistics() {
                 borderWidth: 1,
                 hoverBorderWidth: 1,
                 hoverBorderColor: "#000",
+            },
+            {
+                label: "Lợi nhuận",
+                data: dayProfits.map((dayProfit) => dayProfit.profit),
+                backgroundColor: [
+                    "rgba(255,99,71,0.6)"
+                ],
+                borderColor: "black",
+                borderWidth: 1,
+                hoverBorderWidth: 1,
+                hoverBorderColor: "#000",
             }
         ]
     };
@@ -69,7 +85,7 @@ function Statistics() {
     useEffect(() => {
         const getMonthRevenues = async () => {
             const monthRevenuesData = await monthRevenue("");
-            setMonthRevenues(monthRevenuesData.data);
+            setMonthRevenues(monthRevenuesData.data[0].totalRevenue);
         };
         getMonthRevenues();
     }, []);
@@ -77,7 +93,7 @@ function Statistics() {
     useEffect(() => {
         const getDayCosts = async () => {
             const dayCostsData = await dayCost("");
-            setDaycosts(dayCostsData.data);
+            setDayCosts(dayCostsData.data);
         };
         getDayCosts();
     }, []);
@@ -85,9 +101,25 @@ function Statistics() {
     useEffect(() => {
         const getMonthCosts = async () => {
             const monthCostsData = await monthCost("");
-            setMonthCosts(monthCostsData.data);
+            setMonthCosts(monthCostsData.data[0].totalCost);
         };
         getMonthCosts();
+    }, []);
+
+    useEffect(() => {
+        const getDayProfits = async () => {
+            const dayProfitsData = await dayProfit("");
+            setDayProfits(dayProfitsData.data);
+        };
+        getDayProfits();
+    }, []);
+
+    useEffect(() => {
+        const getMonthProfits = async () => {
+            const monthProfitsData = await monthCost("");
+            setMonthProfits(monthProfitsData.data[1].totalProfit);
+        };
+        getMonthProfits();
     }, []);
 
     return (
@@ -109,23 +141,29 @@ function Statistics() {
                                 onSubmit={(value) => {
                                     setGetMonth(value.month);
                                     const getTotal = async () => {
-                                        try {
-                                            const statisticsData = await listAll(value);
-                                            const monthRevenuesData = await monthRevenue(value);
-                                            const dayCostsData = await dayCost(value);
-                                            const monthCostsData = await monthCost(value);
-                                            setStatistics(statisticsData.data);
-                                            setMonthRevenues(monthRevenuesData.data[0].totalRevenue);
-                                            setDaycosts(dayCostsData.data);
-                                            if (!monthCostsData.data) {
-                                                setMonthCosts(0)
-                                            } else {
-                                                setMonthCosts(monthCostsData.data[0].totalCost);
-                                            }
-                                            
-                                        } catch (error) {
-                                            console.log(error);
-                                        }
+                                        const statisticsData = await listAll(value);
+                                        const monthRevenuesData = await monthRevenue(value);
+                                        const dayCostsData = await dayCost(value);
+                                        const monthCostsData = await monthCost(value);
+                                        const dayProfitsData = await dayProfit(value);
+                                        const monthProfitsData = await monthCost(value);
+                                        setStatistics(statisticsData.data);
+                                        setDayCosts(dayCostsData.data);
+                                        setDayProfits(dayProfitsData.data);
+                                        console.log(monthProfitsData.data[0]);
+
+                                        // eslint-disable-next-line no-lone-blocks
+                                        {
+                                            monthCostsData.data[0] !== null ? setMonthCosts(monthCostsData.data[0].totalCost) : setMonthCosts(0);
+                                        };
+                                        // eslint-disable-next-line no-lone-blocks
+                                        {
+                                            monthRevenuesData.data[0] !== null ? setMonthRevenues(monthRevenuesData.data[0].totalRevenue) : setMonthRevenues(0);
+                                        };
+                                        // eslint-disable-next-line no-lone-blocks
+                                        // {
+                                        //     monthProfitsData.data !== null ? setMonthProfits( monthProfitsData.data.totalProfit) : setMonthProfits(0);
+                                        // };
 
                                     };
                                     getTotal();
@@ -148,7 +186,12 @@ function Statistics() {
                                                     Tháng {month}
                                                 </option>
                                             ))}
-                                        </Field>
+                                        </Field>            
+                                            <div>
+                                            <select className="form-select">
+                                                <option>Năm 2023</option>
+                                            </select>
+                                            </div>
                                         <button type="submit" className="btn btn-outline-primary">
                                             Chọn
                                         </button>
@@ -156,23 +199,38 @@ function Statistics() {
                                     <div className="d-flex justify-content-center mx-5">
                                         <LineChart chartData={chartData} />
                                     </div>
-                                    <div className="d-flex justify-content-center mt-4 mb-4">
-                                        <h5
+                                    <div className="d-flex justify-content-center mt-4 mb-2">
+                                        <h6
                                             style={{ backgroundColor: "#93D9D9", width: "500px" }}
                                             className="text-center pt-2 pb-2"
                                         >
-                                            Tổng doanh thu tháng  {statistics.length !== 0 ? <span> {getMonth} : {monthRevenues} VNĐ</span> : <span> {getMonth} : 0 VNĐ</span>}
-                                        </h5>
+                                            Tổng doanh thu tháng  {statistics.length !== 0 ? <span> {getMonth} : {monthRevenues.toLocaleString("vi-VN", {
+                                                style: "currency",
+                                                currency: "VND",
+                                            })}</span> : <span> {getMonth} : 0 đ</span>}
+                                        </h6>
                                     </div>
-
-                                    <div className="d-flex justify-content-center mt-4 mb-4">
-                                        <h5
+                                    <div className="d-flex justify-content-center mt-2 mb-2">
+                                        <h6
                                             style={{ backgroundColor: "#FFC58C", width: "500px" }}
                                             className="text-center pt-2 pb-2"
                                         >
-                                            Tổng chi phí tháng  {dayCosts.length !== 0 ? <span> {getMonth} : {monthCosts} VNĐ </span> : <span> {getMonth} : 0 VNĐ</span>}</h5>
+                                            Tổng chi phí tháng {monthCosts.length !== 0 ? <span> {getMonth} : {monthCosts.toLocaleString("vi-VN", {
+                                                style: "currency",
+                                                currency: "VND",
+                                            })}</span> : <span> {getMonth} : 0 đ</span>}
+                                        </h6>
                                     </div>
-
+                                    <div className="d-flex justify-content-center mt-2 mb-4">
+                                        <h6
+                                            style={{ backgroundColor: "#F4A797", width: "500px" }}
+                                            className="text-center pt-2 pb-2"
+                                        >
+                                            Tổng lợi nhuận tháng  : {(monthRevenues-monthCosts).toLocaleString("vi-VN", {
+                                                style: "currency",
+                                                currency: "VND",
+                                            })} </h6>
+                                    </div>
                                     <div className="text-center">
                                         <button
                                             type="submit"

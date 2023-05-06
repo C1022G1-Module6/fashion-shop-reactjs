@@ -15,6 +15,7 @@ function ListProduct() {
     const [productDetails, setProductDetails] = useState([])
     const [productFilter, setProductFilter] = useState({
         name: "",
+        productTypeId: '',
         page: 0
     })
     const [productTypeName, setProductTypeName] = useState('')
@@ -23,22 +24,26 @@ function ListProduct() {
         page: 0
     })
     const [flag, setFlag] = useState(false);
-
+    const [showList,setShowList] = useState(false)
     const handleTransferId = (id) => {
         setDetailId(id)
     }
     const role = localStorage.getItem('roles')
     const handleGetListByType = async (e) => {
-        // console.log({
-        //     name: +e.target.value,page:currentPage
-        // })
+        const newProductFilter = { name: productFilter.name, productTypeId: e.target.value, page: currentPage }
+        try {
+            const productsResponse = await productService.search(newProductFilter);
+            console.log(productsResponse);
+            setProducts(productsResponse.data.content)
+            setPageCount(productsResponse.data.totalPages)
+            setFlag(true)
+            setProductTypeName(+e.target.value)
+            setProductFilter(newProductFilter)
+            setShowList(false)
+        } catch (error) {
+            console.log(error);
+        }
 
-        const newProductFilter = { name: +e.target.value, page: currentPage }
-        const productsResponse = await productService.searchWithType(newProductFilter);
-        setProducts(productsResponse.data.content)
-        setPageCount(productsResponse.data.totalPages)
-        setFlag(true)
-        setProductTypeName(+e.target.value)
     }
     useEffect(() => {
         const getProductDetails = async () => {
@@ -47,12 +52,20 @@ function ListProduct() {
         }
         getProductDetails();
     }, [detailId])
+
     useEffect(() => {
         const getProducts = async () => {
-            const productsResponse = await productService.search(productFilter);
-            setPageCount(productsResponse.data.totalPages)
-            setProducts(productsResponse.data.content)
-            setFlag(false)
+            console.log(productFilter);
+            try {
+                const productsResponse = await productService.search(productFilter);
+                setPageCount(productsResponse.data.totalPages)
+                setProducts(productsResponse.data.content)
+                setFlag(false)
+                setShowList(false)
+            } catch (error) {
+                setShowList(true)
+                console.log(error);
+            }
         }
         getProducts();
     }, [productFilter])
@@ -73,17 +86,18 @@ function ListProduct() {
         if (!flag) {
             setProductFilter({
                 name: productFilter.name,
+                productTypeId: productFilter.productTypeId,
                 page: `${page.selected}`
             })
         } else {
-            const newProductFilter = { name: productTypeName, page: page.selected }
+            const newProductFilter = { name: productFilter.name, productTypeId: productTypeName, page: page.selected }
             const productsResponse = await productService.searchWithType(newProductFilter);
             setProducts(productsResponse.data.content)
         }
     }
-
+    console.log(products);
     return (
-
+        
         <div>
             <div className="row mx-0 ">
                 <div className="col-3"></div>
@@ -98,20 +112,20 @@ function ListProduct() {
                         <div className="card-body px-5">
                             <div className="mb-3 d-flex justify-content-between">
                                 {
-                                    role === 'ROLE_WAREHOUSE_MANAGER' 
-                                    ? 
-                                    <div>
-                                    <NavLink to={`/AddNewProduct`}>  <button type="button" className="btn btn-outline-primary w-100">
+                                    role === 'ROLE_WAREHOUSE_MANAGER'
+                                        ?
+                                        <div>
+                                            <NavLink to={`/AddNewProduct`}>  <button type="button" className="btn btn-outline-primary w-100">
 
-                                        <i className="bi bi-plus-square" /> Thêm mới
-                                    </button>
-                                    </NavLink>
-                                    </div> 
-                                    : 
-                                    <div>
-                                    </div>
+                                                <i className="bi bi-plus-square" /> Thêm mới
+                                            </button>
+                                            </NavLink>
+                                        </div>
+                                        :
+                                        <div>
+                                        </div>
                                 }
-                                
+
                                 <select className="form-select w-25" onChange={(e) => handleGetListByType(e)}>
                                     <option value="">--- Chọn thể loại ---</option>
                                     {productTypes.map((type) => (
@@ -123,7 +137,8 @@ function ListProduct() {
                                 <div>
                                     <Formik
                                         initialValues={{
-                                            name: productFilter.name
+                                            name: productFilter.name,
+                                            productTypeId: productFilter.productTypeId
                                         }}
                                         onSubmit={(values) => {
                                             // setProductFilter((prev) => {
@@ -131,6 +146,7 @@ function ListProduct() {
                                             // });
                                             setProductFilter({
                                                 name: values.name,
+                                                productTypeId: productFilter.productTypeId,
                                                 page: currentPage
                                             })
                                         }}
@@ -151,7 +167,8 @@ function ListProduct() {
                                     </Formik>
                                 </div>
                             </div>
-                            <div className="table-responsive">
+                            {
+                                !showList ? <div className="table-responsive">
                                 <table className="table table-striped table-hover text-center">
                                     <thead>
                                         <tr>
@@ -187,7 +204,9 @@ function ListProduct() {
 
                                     </tbody>
                                 </table>
-                            </div>
+                            </div> : 
+                            <div >Lỗi</div>
+                            }
                         </div>
                         <ReactPaginate
                             previousLabel="Trước"

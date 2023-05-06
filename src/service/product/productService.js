@@ -1,8 +1,8 @@
 import request from "../../request";
 
-const search = ({name,page}) => {
+const search = ({name,productTypeId,page}) => {
     const token = localStorage.getItem('token')
-    return request.get(`/api/user/product/search?productName=${name ? name : "" }&code=${name? name : "" }&page=${page?page:0}` ,{
+    return request.get(`/api/user/product/search?productName=${name ? name : '' }&productTypeId=${productTypeId ? productTypeId : "" }&page=${page?page:0}` ,{
         headers: {
             'Authorization': `Bearer ${token}`
         }

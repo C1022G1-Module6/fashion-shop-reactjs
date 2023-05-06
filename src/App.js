@@ -14,6 +14,8 @@ import ManagementPage from "./components/statiscial/ManagementPage";
 import LeftSideBar from './components/statiscial/LeftSideBar';
 import { useEffect } from 'react';
 import CustomerList  from './components/customer/CustomerList';
+import EditCustomer from './components/customer/EditCustomer';
+import CreateCustomer from './components/customer/CreateCustomer';
 
 function App() {
   const token = localStorage.getItem('token')
@@ -35,6 +37,8 @@ function App() {
       <Route path='/product' element={<ListProduct />} />
       <Route path='/AddNewProduct' element={<AddProductForm />} />
       <Route path='/customer' element={<CustomerList />} />
+      <Route path='/customer/edit/:id' element={<EditCustomer />} />
+      <Route path='/customer/create' element={<CreateCustomer />} />
       </Route>
     </Routes>
     </div>

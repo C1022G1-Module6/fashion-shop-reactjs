@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import customerService from "../../service/customer/customerService";
+import customerService from "../../service/customer/CustomerService";
 import React from "react";
 
 export default function CustomerDelete(props) {
