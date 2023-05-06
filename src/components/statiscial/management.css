@@ -14,6 +14,28 @@
 
     color: #FF6C37;
 }
+.dropdown-item.active{
+    background-color: #183661;
+}
+.dropdown-item:active{
+    background-color: #183661;
+}
+
+.accordion-button:not(.collapsed) {
+    color: #ffffff;
+    background-color: #183661;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+}
+.nav-link:hover{
+    color: #ffffff;
+    background-color: #183661;
+}
+
+
+.accordion-button:not(.collapsed)::after {
+    transform: rotate(-180deg);
+}
+
 .timeline {
     padding: 0;
     margin-bottom: 0;
