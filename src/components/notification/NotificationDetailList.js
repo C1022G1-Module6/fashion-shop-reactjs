@@ -46,7 +46,9 @@ export default function NotificationDetailList() {
 
                                                             <h5 style={{textAlign: 'center' }} className="detail" ><b>Nội dung chi tiết:</b> </h5>
                                                        
-                                                            <h6  style= {{fontStyle: 'italic', marginTop: '5%', }}>{detail?.content}</h6>
+                                                            {/* <h6  style= {{fontStyle: 'italic', marginTop: '5%', }}>{detail?.content}</h6> */}
+                                                            <h6  style= {{fontStyle: 'italic', marginTop: '5%', }} dangerouslySetInnerHTML={{__html: detail?.content}}></h6>
+
 
                                                     </div>
                                                 </div>

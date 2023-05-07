@@ -5,8 +5,9 @@ import { ErrorMessage, Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import Swal from 'sweetalert2'
 import { NavLink } from 'react-router-dom'
-import CKEditor from '@ckeditor/ckeditor5-react';
-import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+
 export default function NotificationCreate() {
     const [employee, setEmployee] = useState([])
     const [notification, setNotification] = useState()
@@ -65,7 +66,7 @@ export default function NotificationCreate() {
 
                                             ...values,
                                             img: `../../image/` + values.img.name,
-                                            content: +values.content,
+                                            // content: +values.content,
 
                                             employeeDTO: {
                                                 id: +values.employeeDTO
@@ -124,23 +125,29 @@ export default function NotificationCreate() {
                                                         <div className="input-group input-group-merge">
                                                             <span className="input-group-text">
                                                                 <i className="bi bi-pen-fill"></i></span>
-                                                            <Field as='textarea' rows='5' placeholder='Vd: Thông báo nghỉ lễ 30/4 1/5' cols='100' className="form-control char-textarea"
-                                                                name='content'
-                                                                style={{
-                                                                    boxSizing: '0 0 10px 0',
+                            
+                                                            <Field name="content">
+                                                                {({ field, form }) => (
+                                                                    <CKEditor
+                                                                        editor={ClassicEditor}
+                                                                        data={field.value}
+                                                                        onReady={editor => {
+                                                                          
+                                                                        }}
+                                                                        onChange={(event, editor) => {
+                                                                            const data = editor.getData();
+                                                                            form.setFieldValue('content', data);
+                                                                        }}
+                                                                        onBlur={(event, editor) => {
+                                                                            const data = editor.getData();
+                                                                            form.setFieldValue('content', data);
+                                                                            form.setFieldTouched('content', true);
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                            </Field>
 
-                                                                }} />
-{/*                                                                         
-                                                                        <CKEditor
-                                                                            editor={ClassicEditor}
-                                                                            data={values.content}
-                                                                            onChange={(event, editor) => {
-                                                                                const data = editor.getData();
-                                                                                setFieldValue(values.content, data);
-                                                                            }}
-                                                                        /> */}
-                                                                   
-                                                             
+
 
 
                                                         </div>
@@ -173,25 +180,21 @@ export default function NotificationCreate() {
 
                                                                 }
                                                             </Field>
-                                                           
+
                                                             <div className='img' style={{ marginLeft: '70%', marginBottom: '1%' }}>
-                                                    
+
                                                                 {
                                                                     values.img?.name === undefined ?
-                                                                   
-                                                                     <img style={{ width: "300px", height: '250px' }} src={`../../image/no_img.jpg`} />
+
+                                                                        <img style={{ width: "300px", height: '250px' }} src={`../../image/no_img.jpg`} />
                                                                         :
                                                                         <img style={{ width: "300px", height: '250px' }} src={`../../image/${values.img?.name}`} name='img' />
-
-                                                                 
-                                                                       
-
 
 
                                                                 }
 
                                                             </div>
-                                                           
+
 
 
                                                         </div>
