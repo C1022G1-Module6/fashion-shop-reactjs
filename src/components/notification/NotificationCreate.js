@@ -5,10 +5,13 @@ import { ErrorMessage, Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import Swal from 'sweetalert2'
 import { NavLink } from 'react-router-dom'
-
+import CKEditor from '@ckeditor/ckeditor5-react';
+import * as ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 export default function NotificationCreate() {
     const [employee, setEmployee] = useState([])
     const [notification, setNotification] = useState()
+
+
 
 
     console.log(notification);
@@ -28,12 +31,10 @@ export default function NotificationCreate() {
     return (
         <>
             <div className="row">
-                <div className="col-md-12-sm-12-xl-12-lg-12 bg-white">
-                    <h1 style={{ color: 'white' }}> ?? </h1>
-                </div>
+
             </div>
             <div className="row" style={{ height: '100%', width: "100%" }}>
-                <div className=" col-sm-12 col-md-3 col-xl-3 col-lg-3 col-xxl-3 ">
+                <div className="mx-1 col-sm-12 col-md-3 col-xl-3 col-lg-3 col-xxl-3 ">
                 </div>
                 <div className=" col-sm-12 col-md-6 col-xl-6 col-lg-6 col-xxl-6  ">
                     <div className="card " style={{ boxShadow: "8px 8px 16px 8px rgba(0, 0, 0, 0.2)" }}>
@@ -64,7 +65,7 @@ export default function NotificationCreate() {
 
                                             ...values,
                                             img: `../../image/` + values.img.name,
-                                            // content: +values.content,
+                                            content: +values.content,
 
                                             employeeDTO: {
                                                 id: +values.employeeDTO
@@ -91,11 +92,11 @@ export default function NotificationCreate() {
                                             <div className="col-12-sm-12-md-12-xl-12-lg-12 "
                                                 style={{ marginBottom: '2%' }}>
                                                 <div className="mb-1 row">
-                                                    <div className="col-3-sm-3-md-3-xl-3-lg-3">
+                                                    <div className="col-12">
                                                         <label className="col-form-label " htmlFor="fname-icon"><b>Tiêu
                                                             đề:</b></label>
                                                     </div>
-                                                    <div className="col-9-sm-9-md-9-xl-9-lg-9">
+                                                    <div className="col-sm-12 col-md-12 mx-1">
                                                         <div style={{ height: '100%', width: "100%" }}
                                                             className="input-group input-group-merge">
                                                             <span className="input-group-text">
@@ -115,7 +116,7 @@ export default function NotificationCreate() {
                                             <div className="col-12-sm-12-md-12-xl-12-lg-12"
                                                 style={{ marginBottom: '2%' }}>
                                                 <div className="mb-1 row">
-                                                    <div className="col-3-sm-3-md-3-xl-3-lg-3">
+                                                    <div className="col-3">
                                                         <label className="col-form-label" htmlFor="noiDung"><b>Nội
                                                             dung:</b></label>
                                                     </div>
@@ -129,6 +130,17 @@ export default function NotificationCreate() {
                                                                     boxSizing: '0 0 10px 0',
 
                                                                 }} />
+{/*                                                                         
+                                                                        <CKEditor
+                                                                            editor={ClassicEditor}
+                                                                            data={values.content}
+                                                                            onChange={(event, editor) => {
+                                                                                const data = editor.getData();
+                                                                                setFieldValue(values.content, data);
+                                                                            }}
+                                                                        /> */}
+                                                                   
+                                                             
 
 
                                                         </div>
@@ -161,21 +173,27 @@ export default function NotificationCreate() {
 
                                                                 }
                                                             </Field>
-                                                            <div className='img' style={{marginLeft: '70%', marginBottom: '1%'}}>
+                                                           
+                                                            <div className='img' style={{ marginLeft: '70%', marginBottom: '1%' }}>
+                                                    
                                                                 {
-                                                                   values.img?.name === undefined ? 
-                                                                   <img style={{ width: "300px", height: '250px' }} src={`../../image/no_img.jpg`} />
-                                                                   :
-                                                                   <img style={{ width: "300px", height: '250px' }} src={`../../image/${values.img?.name}`} name='img' />
+                                                                    values.img?.name === undefined ?
+                                                                   
+                                                                     <img style={{ width: "300px", height: '250px' }} src={`../../image/no_img.jpg`} />
+                                                                        :
+                                                                        <img style={{ width: "300px", height: '250px' }} src={`../../image/${values.img?.name}`} name='img' />
+
+                                                                 
+                                                                       
 
 
-                                                                        
-                                                
+
                                                                 }
 
                                                             </div>
+                                                           
 
-                                     
+
                                                         </div>
 
 
@@ -218,7 +236,8 @@ export default function NotificationCreate() {
                                                 <center>
                                                     <div className="col-9-sm-9-md-9-xl-9-lg-9">
                                                         <button type="submit" className="btn btn-primary"
-                                                            style={{ width: '150px' }}>
+                                                            style={{ width: '150px' }}
+                                                        >
                                                             < i className="bi bi-plus-square"></i> Thêm mới
                                                         </button>
                                                         <NavLink to={`/notifications`}>
