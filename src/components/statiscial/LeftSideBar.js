@@ -11,25 +11,24 @@ export default function LeftSideBar() {
         localStorage.removeItem('name')
         navigate('/')
     }
+   
+    let roleNoti = localStorage.getItem('roleNotify')
     const employeeDetail = async () => {
         const res = await employeeService.detail()
         setDetail(res.data)
     }
-    // const handleAuthority = ()=>{
-    //     Swal.fire({
-    //         icon: 'error',
-    //         title: 'Bạn không có quyền truy cập',
-    //         showConfirmButton: false,
-    //         timer: 1500
-    //     })
-    // }
+    let [count,setCount]= useState(localStorage.getItem('count'))
     useEffect(() => {
         employeeDetail()
-    }, [])
+    }, [count])
     if (!detail) {
         return null
     }
-
+    const handleCountNotify =()=>{
+        localStorage.removeItem('roleNotify')
+        setCount(0)
+    }
+    
     return (
         <>
             <div className="col-lg-3 col-md-4 col-sm-6  px-0 fixed-top "
@@ -58,8 +57,7 @@ export default function LeftSideBar() {
                                             data-bs-toggle="collapse"
                                             data-bs-target="#collapseOne"
                                             aria-expanded="true"
-                                            aria-controls="collapseOne"
-                                        >
+                                            aria-controls="collapseOne">
                                             Quản lý cửa hàng
                                         </button>
                                     </h2>
@@ -69,13 +67,13 @@ export default function LeftSideBar() {
                                         aria-labelledby="headingOne"
                                         data-bs-parent="#accordionExample">
                                         <div className="nav-item">
-                                            <a
-                                                href="#"
+                                            <NavLink
+                                                to={'/notifications/create'}
                                                 className="nav-link link-dark  text-truncate"
                                                 aria-current="page"
                                             >
                                                 Đăng thông báo
-                                            </a>
+                                            </NavLink>
                                         </div>
                                         <div className="nav-item ">
                                             <NavLink
@@ -83,18 +81,36 @@ export default function LeftSideBar() {
                                                 className="nav-link link-dark  text-truncate"
                                                 aria-current="page"
                                             >
-                                                Xem thống kê
+                                               Xem thống kê
                                             </NavLink>
                                         </div>
                                         <div className="nav-item ">
+                                            <a
+                                                href="http://localhost:4200/news/newsList"
+                                                className="nav-link link-dark  text-truncate"
+                                                aria-current="page"
+                                                target='_blank' rel="noreferrer"
+                                            >
+                                               Thêm tin tức
+                                            </a>
+                                        </div>
+                                        {/* <div className="nav-item ">
                                             <NavLink
-
+                                                to='/product'
+                                                className="nav-link link-dark  text-truncate"
+                                                aria-current="page"
+                                            >
+                                                Hàng trong kho
+                                            </NavLink>
+                                        </div> */}
+                                        {/* <div className="nav-item ">
+                                            <NavLink
                                                 className="nav-link link-dark  text-truncate"
                                                 aria-current="page"
                                             >
                                                 Quản lý nhân viên
                                             </NavLink>
-                                        </div>
+                                        </div> */}
                                         <div className="nav-item ">
                                             <NavLink
                                                 to='/customer'
@@ -131,10 +147,10 @@ export default function LeftSideBar() {
                                             aria-labelledby="headingTwo"
                                             data-bs-parent="#accordionExample"
                                         >
-                                            <div className="nav-item ">
+                                             <div className="nav-item ">
                                                 <NavLink
                                                     to={'/product'}
-                                                    className="nav-link link-dark   text-truncate"
+                                                    className="nav-link link-dark  text-truncate"
                                                     aria-current="page"
                                                 >
                                                     Hàng trong kho
@@ -154,17 +170,17 @@ export default function LeftSideBar() {
                                                     className="nav-link link-dark   text-truncate"
                                                     aria-current="page"
                                                 >
-                                                    Thống kê
+                                                   Xem thống kê
                                                 </NavLink>
                                             </div>
                                             <div className="nav-item ">
-                                                <a
-                                                    href="#"
+                                                <NavLink
+                                                    to={'/notifications'}
                                                     className="nav-link link-dark   text-truncate"
                                                     aria-current="page"
                                                 >
                                                     Thông báo mới
-                                                </a>
+                                                </NavLink>
                                             </div>
                                         </div>
                                     </> :
@@ -189,15 +205,6 @@ export default function LeftSideBar() {
                                             data-bs-parent="#accordionExample"
                                         >
                                             <div className="nav-item ">
-                                                <NavLink
-                                                    to={'/product'}
-                                                    className="nav-link link-dark   text-truncate"
-                                                    aria-current="page"
-                                                >
-                                                    Hàng trong kho
-                                                </NavLink>
-                                            </div>
-                                            <div className="nav-item ">
                                                 <NavLink to={'/invoice'}
                                                     className="nav-link link-dark   text-truncate"
                                                     aria-current="page"
@@ -211,17 +218,17 @@ export default function LeftSideBar() {
                                                     className="nav-link link-dark   text-truncate"
                                                     aria-current="page"
                                                 >
-                                                    Thống kê
+                                                  Xem thống kê
                                                 </NavLink>
                                             </div>
                                             <div className="nav-item ">
-                                                <a
-                                                    href="#"
+                                                <NavLink
+                                                    to={'/notifications'}
                                                     className="nav-link link-dark   text-truncate"
                                                     aria-current="page"
                                                 >
                                                     Thông báo mới
-                                                </a>
+                                                </NavLink>
                                             </div>
                                         </div>
                                     </>
@@ -260,13 +267,13 @@ export default function LeftSideBar() {
                                                 </NavLink>
                                             </div>
                                             <div className="nav-item ">
-                                                <a
-                                                    href="#"
+                                                <NavLink 
+                                                    to={'/data-entry'}
                                                     className="nav-link link-dark text-truncate"
                                                     aria-current="page"
                                                 >
                                                     Nhập liệu
-                                                </a>
+                                                </NavLink>
                                             </div>
                                             <div className="nav-item ">
                                                 <NavLink
@@ -274,17 +281,17 @@ export default function LeftSideBar() {
                                                     className="nav-link link-dark text-truncate"
                                                     aria-current="page"
                                                 >
-                                                    Thống kê
+                                                  Xem thống kê
                                                 </NavLink>
                                             </div>
                                             <div className="nav-item ">
-                                                <a
-                                                    href="#"
+                                                <NavLink
+                                                    to="/notifications"
                                                     className="nav-link link-dark text-truncate"
                                                     aria-current="page"
                                                 >
                                                     Thông báo mới
-                                                </a>
+                                                </NavLink>
                                             </div>
                                         </div>
                                     </>
@@ -320,13 +327,13 @@ export default function LeftSideBar() {
                                                 </NavLink>
                                             </div>
                                             <div className="nav-item ">
-                                                <a
-                                                    href="#"
+                                                <NavLink
+                                                    to={'/data-entry'}
                                                     className="nav-link link-dark text-truncate"
                                                     aria-current="page"
                                                 >
                                                     Nhập liệu
-                                                </a>
+                                                </NavLink>
                                             </div>
                                             <div className="nav-item ">
                                                 <NavLink
@@ -334,17 +341,17 @@ export default function LeftSideBar() {
                                                     className="nav-link link-dark text-truncate"
                                                     aria-current="page"
                                                 >
-                                                    Thống kê
+                                                  Xem thống kê
                                                 </NavLink>
                                             </div>
                                             <div className="nav-item ">
-                                                <a
-                                                    href="#"
+                                                <NavLink
+                                                    to="/notifications"
                                                     className="nav-link link-dark text-truncate"
                                                     aria-current="page"
                                                 >
                                                     Thông báo mới
-                                                </a>
+                                                </NavLink>
                                             </div>
                                         </div>
                                     </>
@@ -377,37 +384,6 @@ export default function LeftSideBar() {
                         </div>
                         {/* Right elements */}
                         <div className="d-flex align-items-center me-3">
-                            {/* Notifications */}
-                            <div className="dropup">
-                                <a
-                                    className="text-reset me-1 dropdown-toggle hidden-arrow"
-                                    href="#"
-                                    id="navbarDropdownMenuLink"
-                                    role="button"
-                                    data-mdb-toggle="dropdown"
-                                    aria-expanded="false"
-                                >
-                                    <i className="fas fa-bell" />
-                                    <span className="badge rounded-pill badge-notification bg-danger">
-                                        1
-                                    </span>
-                                </a>
-                                <ul
-                                    className="dropdown-menu"
-                                    aria-labelledby="navbarDropdownMenuLink"
-                                >
-                                    <li>
-                                        <a className="dropdown-item" href="#">
-                                            Một vài tin tức
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a className="dropdown-item" href="#">
-                                            Tin tức khác
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
                             {/* Avatar */}
                             <div className="dropup">
                                 <a
@@ -434,11 +410,6 @@ export default function LeftSideBar() {
                                             Thông tin cá nhân
                                         </NavLink>
                                     </li>
-                                    {/* <li>
-                                    <a className="dropdown-item" href="#">
-                                        Cài đặt
-                                    </a>
-                                </li> */}
                                     <li>
                                         <button onClick={handleLogout} className="dropdown-item" href="#">
                                             Đăng xuất
@@ -450,13 +421,6 @@ export default function LeftSideBar() {
                     </nav>
                 </div>
             </div>
-            {/* <div className="col-9 px-0" style={{
-                position: 'fixed',
-                right: 0,
-                zIndex: 99
-            }}>
-                
-            </div> */}
             <Outlet />
         </>
     )

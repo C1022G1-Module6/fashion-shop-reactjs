@@ -6,7 +6,6 @@ import loginService from "../../service/loginService";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import loginStyle from './loginStyle.module.css'
-
 import * as Yup from 'yup';
 import { RotatingLines } from "react-loader-spinner";
 import Swal from "sweetalert2";
@@ -18,13 +17,16 @@ export default function Login() {
     const [submit, setSubmit] = useState(false)
     const [countdown, setCountdown] = useState(0);
     const navigate = useNavigate()
+    const [showPassword, setShowPassword] = useState(false)
+    const [showNewPassword, setShowNewPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     useEffect(() => {
         document.title = "Đăng Nhập"; // Thay đổi title
     }, [])
     const handleShowFromEmail = () => {
         setShowFormEmail(true)
     }
-    const handleHideEmail = () => { 
+    const handleHideEmail = () => {
         setShowFormEmail(false)
     }
     const handleHideOtp = () => {
@@ -44,8 +46,7 @@ export default function Login() {
             console.log(error);
         }
     }
-
-
+    
     useEffect(() => {
         const intervalId = setInterval(() => {
             setCountdown(countdown => countdown - 1);
@@ -55,7 +56,6 @@ export default function Login() {
         }
         return () => clearInterval(intervalId);
     }, [countdown]);
-
 
     return (
         <>
@@ -130,7 +130,6 @@ export default function Login() {
                                                     }
                                                     login()
                                                 }}
-
                                             >
                                                 <Form>
                                                     <div className="form-outline pt-2">
@@ -143,7 +142,7 @@ export default function Login() {
                                                         <Field
                                                             type="text"
                                                             id="form2Example11"
-                                                            className="form-control"
+                                                            className="form-control "
                                                             placeholder="Nhập tài khoản của bạn"
                                                             name="username"
                                                         />
@@ -154,19 +153,32 @@ export default function Login() {
 
                                                     </div>
                                                     <div className="form-outline pt-2">
-                                                        <label
-                                                            className="form-label fw-bold"
-                                                            htmlFor="form2Example22"
-                                                        >
-                                                            Mật Khẩu:
-                                                        </label>
-                                                        <Field
-                                                            type="password"
-                                                            id="form2Example22"
-                                                            className="form-control"
-                                                            placeholder="Nhập mật khẩu của bạn"
-                                                            name="password"
-                                                        />
+                                                        <div>
+                                                            <label
+                                                                className="form-label fw-bold "
+                                                                htmlFor="form2Example22"
+                                                            >
+                                                                Mật Khẩu:
+                                                            </label>
+                                                        </div>
+                                                        <div className="position-relative">
+                                                            <Field
+                                                                type={showPassword ? "text" : "password"}
+                                                                id="form2Example22"
+                                                                className="form-control pr-5"
+                                                                placeholder="Nhập mật khẩu của bạn"
+                                                                name="password"
+
+                                                            />
+                                                            {
+                                                                showPassword
+                                                                    ?
+                                                                    <i type="button" onClick={() => { setShowPassword(!showPassword) }} className='bi bi-eye-slash-fill position-absolute top-50 translate-middle-y me-2 end-0'></i>
+                                                                    :
+                                                                    <i type="button" onClick={() => { setShowPassword(!showPassword) }} className='bi bi-eye-fill position-absolute top-50 translate-middle-y me-2 end-0'></i>
+
+                                                            }
+                                                        </div>
                                                     </div>
                                                     <div>
                                                         <span className="text-danger" id="passwordError"></span>
@@ -181,7 +193,7 @@ export default function Login() {
                                                         </button>
                                                     </div>
                                                     <div className="text-center">
-                                                        <a type="button" className={`text-muted ${loginStyle.bgForgotPassword}`}onClick={handleShowFromEmail}>
+                                                        <a type="button" className={`text-muted ${loginStyle.bgForgotPassword}`} onClick={handleShowFromEmail}>
                                                             Quên mật khẩu?
                                                         </a>
                                                     </div>
@@ -470,8 +482,18 @@ export default function Login() {
                                         <div className="mt-2">
                                             <label htmlFor="newPassword" className="fw-bold form-label">Mật khẩu mới:</label>
                                         </div>
-                                        <div >
-                                            <Field type="password" id="newPassword" className="form-control" name="newPassword" placeholder="Nhập mật khẩu mới..." />
+                                        <div className="position-relative">
+                                            <Field type={showNewPassword ? "text" : "password"}
+                                                id="newPassword"
+                                                className="form-control"
+                                                name="newPassword" placeholder="Nhập mật khẩu mới" />
+                                            {
+                                                showNewPassword
+                                                    ?
+                                                    <i type="button" onClick={() => { setShowNewPassword(!showNewPassword) }} className={`bi bi-eye-slash-fill me-2 position-absolute top-50 translate-middle-y end-0`}></i>
+                                                    :
+                                                    <i type="button" onClick={() => { setShowNewPassword(!showNewPassword) }} className={`bi bi-eye-fill me-2 position-absolute top-50 translate-middle-y end-0`}></i>
+                                            }
                                         </div>
                                         <div >
                                             <span className="text-danger" id="newPasswordErr"></span>
@@ -479,8 +501,16 @@ export default function Login() {
                                         <div className="mt-2">
                                             <label htmlFor="confirmPassword" className="fw-bold form-label">Xác nhận mật khẩu:</label>
                                         </div>
-                                        <div >
-                                            <Field type="password" id="confirmPassword" className="form-control" name="confirmPassword" placeholder="Xác nhận mật khẩu..." />
+                                        <div className="position-relative">
+                                            <Field type={showConfirmPassword ? "text" : "password"}
+                                                id="confirmPassword" className="form-control" name="confirmPassword" placeholder="Xác nhận mật khẩu mới" />
+                                            {
+                                                showConfirmPassword
+                                                    ?
+                                                    <i type="button" onClick={() => { setShowConfirmPassword(!showConfirmPassword) }} className={`bi bi-eye-slash-fill me-2 position-absolute top-50 translate-middle-y end-0`}></i>
+                                                    :
+                                                    <i type="button" onClick={() => { setShowConfirmPassword(!showConfirmPassword) }} className={`bi bi-eye-fill me-2 position-absolute top-50 translate-middle-y end-0`}></i>
+                                            }
                                         </div>
                                         <div>
                                             <span className="text-danger" id="confirmPasswordErr"></span>

@@ -1,212 +1,282 @@
 import React, { useEffect, useState } from 'react'
 import * as NotificationService from './service/NotificationService'
 import { ErrorMessage, Field, Form, Formik } from 'formik'
-// import CKEditor from "@ckeditor/ckeditor5-react";
+
 import * as Yup from 'yup'
 import Swal from 'sweetalert2'
+import { NavLink, useNavigate} from 'react-router-dom'
+import { CKEditor } from '@ckeditor/ckeditor5-react'
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import LeftSideBar from '../statiscial/LeftSideBar'
 
+// import { CKEditor } from '@ckeditor/ckeditor5-react';
 export default function NotificationCreate() {
-  const [employee, setEmployee] = useState([])
-  const [notification, setNotification] = useState()
+    const [employee, setEmployee] = useState([])
+    const [notification, setNotification] = useState()
 
-  console.log(notification);
-  const listNotification = async () => {
-    let res = await NotificationService.getAllNotification()
-    return setNotification(res)
-  }
-  const listEmployee = async () => {
-    let res = await NotificationService.getAllEmployee()
-    setEmployee(res)
-  }
-  useEffect(() => {
-
-    listEmployee()
-    listNotification()
-  }, [])
-
-  return (
-    <>
-      <div className="row">
-        <div className="col-md-12-sm-12-xl-12-lg-12 bg-white">
-          <h1 style={{ color: 'white' }}> ?? </h1>
-        </div>
-      </div>
-      <div className="row" style={{ height: '100%', width: "100%" }}>
-        <div className=" col-sm-12 col-md-3 col-xl-3 col-lg-3 col-xxl-3 ">
-        </div>
-        <div className=" col-sm-12 col-md-6 col-xl-6 col-lg-6 col-xxl-6  ">
-          <div className="card " style={{ boxShadow: "8px 8px 16px 8px rgba(0, 0, 0, 0.2)" }}>
-            <div className="card-header " style={{ backgroundColor: '#183661', color: "white" }}>
-              <h4 className="card-title text-center "><b>ĐĂNG THÔNG BÁO</b></h4>
-            </div>
-            <div className="card-body">
-              <Formik initialValues={{
-                title: '',
-                content: '',
-                img: null,
-                employeeDTO: employee?.id
-              }}
-                validationSchema={Yup.object({
-                  title: Yup.string().required('Vui lòng nhập tiêu đề bài đăng').min(6, 'Tối thiểu 6 kí tự').max(30, 'Tối đa là 30 kí tự'),
-                  content: Yup.string().required('Vui long nhập nội dung bài đăng').min(20, 'Tối thiểu 20 kí tự').max(300, 'Tối đa là 300 kí tự'),
-                  img: Yup.string().required('Vui lòng chọn ảnh'),
-                  employeeDTO: Yup.string().required('Vui lòng chọn đối tượng hiển thị')
-
-
-
-                })}
-                onSubmit={async (values) => {
-                  const formData = new FormData();
-                  formData.append('img', values.img)
-                  console.log(values.img);
-                  await NotificationService.save(
-                    {
-                      ...values,
-                      img: `../../image/` + values.img.name
-
-                      ,
-
-                      employeeDTO: {
-                        id: +values.employeeDTO
-                      }
-                    }
-                    
-                  )
-                  console.log(values)
-                
-               
-                    Swal.fire(
-                      'Good job!',
-                      'You clicked the button!',
-                      'success'
-                    )
-                
-                 
-                 
-
-                }}>
-
-                {({ setFieldValue }) => (
-
-                  <Form className="form form-horizontal">
-
-                    <div className="row">
-                      <div className="col-12-sm-12-md-12-xl-12-lg-12 " style={{ marginBottom: '2%' }}>
-                        <div className="mb-1 row">
-                          <div className="col-3-sm-3-md-3-xl-3-lg-3">
-                            <label className="col-form-label " htmlFor="fname-icon"><b>Tiêu đề:</b></label>
-                          </div>
-                          <div className="col-9-sm-9-md-9-xl-9-lg-9">
-                            <div style={{ height: '100%', width: "100%" }} className="input-group input-group-merge">
-                              <span className="input-group-text"><i className="bi bi-pencil-square"></i></span>
-                              <Field type="text" id="fname-icon" className="form-control " name='title'
-                                placeholder="Nhập tiêu đề" />
-
-                            </div>
-                            <div>
-                              <ErrorMessage name='title' className='text-danger' component='span' />
-                            </div>
-                          </div>
+    console.log(notification);
+    const listNotification = async () => {
+        let res = await NotificationService.getAllNotification()
+        return setNotification(res)
+    }
+    const listEmployee = async () => {
+        let res = await NotificationService.getAllEmployee()
+        setEmployee(res)
+    }
+    const navigate= useNavigate()
+    useEffect(() => {
+        listEmployee()
+        listNotification()
+    }, [])
+    let [count, setCount] = useState(() => {
+        const savedCount = localStorage.getItem('count');
+        return savedCount !== null ? parseInt(savedCount) : 0;
+    });
+    let [saveCount, setSaveCount] = useState(0);
+    // const [roleNotify, setRoleNotify] = useState('');
+    
+    useEffect(() => {
+        localStorage.setItem('count', count);
+    }, [count]);
+    
+    // useEffect(() => {
+    //     localStorage.setItem('roleNotify', roleNotify);
+    // }, [roleNotify]);
+    useEffect(() => {
+        document.title = "Thêm mới thông báo";
+      }, []);
+    return (
+        <>
+            <div className='row mx-0'>
+                <div className='col-3'></div>
+                <div className="col-7 mx-auto mt-3">
+                <div>
+                    <div className="card " style={{ boxShadow: "8px 8px 16px 8px rgba(0, 0, 0, 0.2)" }}>
+                        <div className="card-header " style={{ backgroundColor: '#183661', color: "white" }}>
+                            <h4 className="card-title text-center "><b>ĐĂNG THÔNG BÁO</b></h4>
                         </div>
-                      </div>
-                      <div className="col-12-sm-12-md-12-xl-12-lg-12" style={{ marginBottom: '2%' }}>
-                        <div className="mb-1 row">
-                          <div className="col-3-sm-3-md-3-xl-3-lg-3">
-                            <label className="col-form-label" htmlFor="noiDung"><b>Nội dung:</b></label>
-                          </div>
-                          <div className="col-9-sm-9-md-9-xl-9-lg-9">
-                            <div className="input-group input-group-merge">
-                              <span className="input-group-text"><i className="bi bi-pen-fill"></i></span>
+                        <div className="card-body">
+                            <Formik initialValues={{
+                                title: '',
+                                content: '',
+                                img: null,
+                                role: '',
+                            }}
+                                validationSchema={Yup.object({
+                                    title: Yup.string().required('Vui lòng nhập tiêu đề bài đăng').min(6, 'Tối thiểu 6 kí tự').max(30, 'Tối đa là 30 kí tự'),
+                                    content: Yup.string().required('Vui long nhập nội dung bài đăng').min(20, 'Tối thiểu 20 kí tự').max(1000, 'Tối đa là 1000 kí tự'),
+                                    img: Yup.string().required('Vui lòng chọn ảnh'),
+                                    role: Yup.string().required('Vui lòng chọn đối tượng hiển thị')
+                                })}
+                                onSubmit={async (values, {resetForm}) => {
+                                    const formData = new FormData();
+                                    formData.append('img', values.img.name)
+                                    try {
+                                        await NotificationService.save(
+                                            {
+                                                ...values,
+                                                img: `../../image/` + values.img.name,
+                                                // content: +values.content,
+                                            }
+                                        )
+                                        resetForm();
+                                        Swal.fire(
+                                            'Đăng thông báo thành công ',
+                                            values.title,
+                                            'success'
+                                        )
+                                        navigate('/notifications')
+                                        // setCount(count+1)
+                                        // // setSaveCount(count+1)
+                                        // // setRoleNotify(values.role)
+                                        // // console.log(count);
+                                        // localStorage.setItem('count',count+1)
+                                        // localStorage.setItem('roleNotify',values.role)
+                                            
+                                    } catch (error) {
+                                        console.log(error);
+                                    }
+                                }}>
 
-                              <Field as='textarea' className="form-control char-textarea" name='content'
-                                style={{ boxSizing: '0 0 10px 0', cols: '70', rows: '4' }} />
-                            </div>
-                            <ErrorMessage name='content' className='text-danger' component='span' />
+                                {({
+                                    setFieldValue, handleSubmit, values
+                                }) => (
 
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-12-sm-12-md-12-xl-12-lg-12" style={{ marginBottom: '2%' }}>
-                        <div className="mb-1 row">
-                          <div className="col-3-sm-3-md-3-xl-3-lg-3">
-                            <label className="col-form-label" htmlFor="hinhAnh"><b>Hình ảnh:</b></label>
-                          </div>
-                          <div className="col-9-sm-9-md-9-xl-9-lg-9">
-                            <div className="input-group input-group-merge">
-                              <Field id="hinhAnh" className="form-control" name="img">
-                                {
-                                  ({ field }) => (
 
-                                    <input type="file"accept="image/*" aria-label="Chọn tệp"  onChange={(event) => {
-                                      setFieldValue('img', event.currentTarget.files[0]);
-                                    }} />
-                                  )
+                                    <Form className="form form-horizontal">
+
+
+                                        <div className="row">
+                                            <div className="col-12-sm-12-md-12-xl-12-lg-12 "
+                                                style={{ marginBottom: '2%' }}>
+                                                <div className="mb-1 row">
+                                                    <div className="col-3-sm-3-md-3-xl-3-lg-3">
+                                                        <label className="col-form-label " htmlFor="fname-icon"><b>Tiêu
+                                                            đề:<span
+                                                        style={{ color: 'red' }}>*</span></b></label>
+                                                    </div>
+                                                    <div className="col-9-sm-9-md-9-xl-9-lg-9">
+                                                        <div style={{ height: '100%', width: "100%" }}
+                                                            className="input-group input-group-merge">
+                                                            <span className="input-group-text">
+                                                                <i className="bi bi-pencil-square"></i></span>
+                                                            <Field type="text" id="fname-icon" className="form-control "
+                                                                name='title'
+                                                                placeholder="Vd: Lịch nghỉ lễ 30/4, 1/5" />
+
+                                                        </div>
+                                                        <div>
+                                                            <ErrorMessage name='title' className='text-danger'
+                                                                component='span' />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="col-12-sm-12-md-12-xl-12-lg-12"
+                                                style={{ marginBottom: '2%' }}>
+                                                <div className="mb-1 row">
+                                                    <div className="col-3-sm-3-md-3-xl-3-lg-3">
+                                                        <label className="col-form-label" htmlFor="noiDung"><b>Nội
+                                                            dung:<span
+                                                        style={{ color: 'red' }}>*</span></b></label>
+                                                    </div>
+                                                    <div className="col-9-sm-9-md-9-xl-9-lg-9">
+                                                        <div>
+                                                            <span className="input-group-text">
+                                                                <i className="bi bi-pen-fill"></i></span>
+                                                                <Field name="content">
+                                                                {({ field, form }) => (
+                                                                    <CKEditor
+                                                                        editor={ClassicEditor}
+                                                                        data={field.value}
+                                                                        onReady={editor => {
+                                                                          
+                                                                        }}
+                                                                        onChange={(event, editor) => {
+                                                                            const data = editor.getData();
+                                                                            form.setFieldValue('content', data);
+                                                                        }}
+                                                                        onBlur={(event, editor) => {
+                                                                            const data = editor.getData();
+                                                                            form.setFieldValue('content', data);
+                                                                            form.setFieldTouched('content', true);
+                                                                        }}
+                                                                    />
+                                                                )}
+                                                            </Field>
+                                                        </div>
+                                                        <ErrorMessage name='content' className='text-danger'
+                                                            component='span' />
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="col-12-sm-12-md-12-xl-12-lg-12"
+                                                style={{ marginBottom: '2%' }}>
+                                                <div className="mb-1 row">
+                                                    <div className="col-3-sm-3-md-3-xl-3-lg-3">
+                                                        <label className="col-form-label" htmlFor="hinhAnh"><b>Hình ảnh:<span
+                                                        style={{ color: 'red' }}>*</span></b></label>
+                                                    </div>
+                                                    <div className="colsm-9 col-md-9 col-xl-9 col-lg-9">
+
+                                                        <div className="">
+                                                            <Field id="hinhAnh" className="form-control" name="img">
+                                                                {
+                                                                    ({ field }) => (
+
+                                                                        <input type="file" accept="image/*"
+                                                                            aria-label="Chọn tệp"
+                                                                            onChange={(event) => {
+                                                                                setFieldValue('img', event.currentTarget.files[0]);
+                                                                            }} />
+                                                                    )
+
+                                                                }
+                                                            </Field>
+                                                            <div className='img' style={{marginLeft: '0%', marginBottom: '1%'}}>
+                                                                {
+                                                                   values.img?.name === undefined ? 
+                                                                   <img style={{ width: "300px", height: '250px' }} src={`../../image/no_img.jpg`} />
+                                                                   :
+                                                                   <img style={{ width: "300px", height: '250px' }} src={`../../image/${values.img?.name}`} name='img' />
+                                                                }
+                                                            </div> 
+                                                        </div>
+                                                        <ErrorMessage name='img' className='text-danger'
+                                                            component='span' />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div 
+                                                style={{ marginBottom: '5%' }}>
+                                                <div className="mb-1">
+
+                                                    <label className="d-block form-label"> <b>Đối tượng: <span
+                                                        style={{ color: 'red' }}>*</span> </b> </label>
+                                                    <div className="form-check my-50" style={{ marginLeft: '15%' }}>
+                                                        <Field type="radio" id="validationRadiojq3" name="role"
+                                                            className="form-check-input" value='ROLE_WAREHOUSE_MANAGER' />
+                                                        <label className="form-check-label"
+                                                            htmlFor="validationRadiojq3">Quản lý kho
+                                                            hàng</label>
+                                                    </div>
+
+                                                    <div className="form-check" style={{ marginLeft: '15%' }}>
+                                                        <Field type="radio" id="validationRadiojq2" name="role"
+                                                            className="form-check-input" value='ROLE_SALER' />
+                                                        <label className="form-check-label"
+                                                            htmlFor="validationRadiojq2">Nhân viên bán hàng</label>
+                                                    </div>
+                                                    <ErrorMessage name='employeeDTO' className='text-danger'
+                                                        component='span' />
+
+                                                </div>
+
+                                                <center>
+                                                    <div className="col-9-sm-9-md-9-xl-9-lg-9 mt-4">
+                                                    
+                                                        <button type="submit"  className="btn btn-primary"
+                                                            style={{ width: '150px' }}>
+                                                            < i className="bi bi-plus-square"></i> Thêm mới
+                                                        </button>
+                                                        
+                                                        <NavLink to={`/notifications`}>
+                                                            <button
+                                                                type="button"
+                                                                className="btn btn-secondary"
+                                                                style={{ marginLeft: '3%' }}
+                                                            >
+                                                                <i className="bi bi-x-circle" /> Hủy
+                                                            </button>
+                                                        </NavLink>
+
+                                                    </div>
+
+                                                </center>
+                                            </div>
+                                        </div>
+
+                                    </Form>
+
+                                )
 
                                 }
-                              </Field>
-                            
 
-                            </div>
-                            <ErrorMessage name='img' className='text-danger' component='span' />
-                          </div>
+
+                            </Formik>
                         </div>
-                      </div>
-                      <div className="col-12-sm-12-md-12-xl-12-lg-12" style={{ marginBottom: '5%' }}>
-                        <div className="mb-1 row">
-
-                          <label className="d-block form-label"> <b>Đối tượng: <span style={{ color: 'red' }}>*</span> </b> </label>
-                          <div className="form-check my-50" style={{ marginLeft: '15%' }}>
-                            <Field type="radio" id="validationRadiojq3" name="employeeDTO"
-                              className="form-check-input" value='3' />
-                            <label className="form-check-label" htmlFor="validationRadiojq3">Quản lý kho
-                              hàng</label>
-                          </div>
-                          <div className="form-check" style={{ marginLeft: '15%' }}>
-                            <Field type="radio" id="validationRadiojq21" name="employeeDTO"
-                              className="form-check-input" value='1' />
-                            <label className="form-check-label" htmlFor="validationRadiojq1">Quản lý cửa
-                              hàng</label>
-                          </div>
-                          <div className="form-check" style={{ marginLeft: '15%' }}>
-                            <Field type="radio" id="validationRadiojq2" name="employeeDTO"
-                              className="form-check-input" value='2' />
-                            <label className="form-check-label" htmlFor="validationRadiojq2">Quản lý bán
-                              hàng</label>
-                          </div>
-                          <ErrorMessage name='employeeDTO' className='text-danger' component='span' />
-
-                        </div>
-
-                        <center>
-                          <div className="col-9-sm-9-md-9-xl-9-lg-9" >
-                            <button type="submit" className="btn btn-outline-primary" style={{ width: '150px' }}><i
-                              className="bi bi-plus-square"></i> Thêm mới</button>
-                            <button style={{ marginLeft: '3%' }} type="reset" className="btn btn-outline-secondary waves-effect">Hủy</button>
-                          </div>
-                        </center>
-
-
-
-                      </div>
                     </div>
+                </div>
+                <div className=" col-sm-12 col-md-3 col-xl-3 col-lg-3 col-xxl-3 ">
 
-                  </Form>
-
-                )
-
-                }
-
-
-              </Formik>
+                </div>
             </div>
-          </div>
-        </div>
-        <div className=" col-sm-12 col-md-3 col-xl-3 col-lg-3 col-xxl-3 ">
-
-        </div>
-      </div>
-
-
-    </>
-  )
+            </div>
+            {/* <LeftSideBar 
+                count = {count}
+                roleNotify = {roleNotify}
+            /> */}
+        </>
+    )
 }

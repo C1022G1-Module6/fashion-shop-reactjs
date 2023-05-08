@@ -24,7 +24,7 @@ function App() {
     <>
     <div className='row mx-0'>
       <Routes>
-      <Route path='/' element={<Login />}/>
+      <Route path='/' element={<Login /> }/>
       <Route path='/' element={<LeftSideBar />}>
       <Route path='/home' element={<ManagementPage />} />
       <Route path='/notifications' element={<Notification />} />

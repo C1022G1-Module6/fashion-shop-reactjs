@@ -75,12 +75,12 @@ export default function ManagementPage() {
         <>
             {/* <div className="row mx-0"> */}
                 <div className="col-3"></div>
-                <div className="col-md-9 px-0 mt-3">
+                <div className="col-md-9 px-0 mt-1">
                     <div className="container p-5 py-3">
                         {/* Navbar */}
                      
                         {/* Navbar */}
-                        <div className="row pt-3">
+                        <div className="row ">
                             <div className="col-4 " style={{textAlign: "center"}}>
                                 <div className="card text-center mb-3 shadow">
                                     <div className="card-body" style={{height: 184}}>
@@ -132,7 +132,7 @@ export default function ManagementPage() {
                                             <div className="col-6">
                                                 <select onChange={handleChange}
                                                         aria-label="Default select example "
-                                                        style={{width: 98,height:24}}
+                                                        style={{width: 98,height:24,borderRadius:12}}
                                                 >
                                                     <option value={1}>Tuần này</option>
                                                     <option value={2}>Tháng này</option>
@@ -190,7 +190,7 @@ export default function ManagementPage() {
                                                     })}</td>
                                                     <td className="text-nowrap">
                                                         <div className="d-flex flex-column fs-5">
-                                                            <span className=" mb-25">{el.total} sản phẩm</span>
+                                                            <span className=" mb-25">{el.total?.toLocaleString('de-DE')} sản phẩm</span>
                                                         </div>
                                                     </td>
                                                 </tr>

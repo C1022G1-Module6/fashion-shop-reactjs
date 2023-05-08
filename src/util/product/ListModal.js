@@ -44,8 +44,7 @@ function ListModal(props) {
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
-
+                                <button type="button" className="btn btn-outline-secondary" data-bs-dismiss="modal">Đóng</button>
                             </div>
                         </div>
                     </div>

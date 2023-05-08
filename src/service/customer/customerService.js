@@ -29,9 +29,14 @@ const deleteCustomer = (id) => {
 }
 
  const saveCustomer = async (customer) => {
+    const token = localStorage.getItem('token')
     console.log(customer);
     try{
-       return await request.post(`/api/customer/create`,{...customer})
+       return await request.post(`/api/customer/create`,{...customer}, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
     }
     catch(err){
         console.log(err);
@@ -39,9 +44,14 @@ const deleteCustomer = (id) => {
 }
 
  const findCustomerById = async (id) => {
+    const token = localStorage.getItem('token')
     console.log(id);
     try{
-        const res = await request.get(`/api/customer/${id}`)
+        const res = await request.get(`/api/customer/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
         console.log(res.data);
         return res.data
        
@@ -52,9 +62,14 @@ const deleteCustomer = (id) => {
 }
 
  const editCustomer = async (customer) => {
+    const token = localStorage.getItem('token')
     console.log(customer);
     try {
-        await request.patch(`/api/customer/update/${customer.id}`, { ...customer })
+        await request.patch(`/api/customer/update/${customer.id}`, { ...customer }, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
     } catch (err) {
         console.log(err);
     }

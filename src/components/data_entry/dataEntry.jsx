@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import dataEntryProductService from "../../service/data_entry/dataEntryProductService";
 import dataEntryService from "../../service/data_entry/dataEntryService";
 import ModalDeleteInvoice from "../../util/invoice/ModalDeleteInvoice";
@@ -10,6 +10,7 @@ import styles from "./dataEntry.module.css";
 import productSizeService from "../../service/product/productSizeService";
 import productService from "../../service/product/productService";
 import ReactPaginate from "react-paginate";
+import * as Yup from "yup";
 
 function DataEntry() {
   const [dataEntryProducts, setDataEntryProducts] = useState([]);
@@ -30,7 +31,7 @@ function DataEntry() {
     deletedId: "",
     deletedName: "",
   });
-  const employeeName = localStorage.getItem('name')
+  const employeeName = localStorage.getItem("name");
 
   const cancel = async () => {
     dataEntryService.remove();
@@ -51,10 +52,10 @@ function DataEntry() {
     const tr = document.querySelector(`.tr${id}`);
     if (tr.classList.contains(styles.color)) {
       tr.classList.remove(styles.color);
-      setProductCode("")
+      setProductCode("");
     } else {
       tr.classList.add(styles.color);
-      setProductCode(code)
+      setProductCode(code);
     }
   };
 
@@ -87,7 +88,6 @@ function DataEntry() {
       quantity: +productQuantity,
       productDTO: { code: productCode },
     };
-    console.log(newValues);
     try {
       await dataEntryProductService.add(newValues);
       if (values.quantity >= 0) {
@@ -99,57 +99,89 @@ function DataEntry() {
       }
     } catch (error) {
       console.log(error.response.data);
-      const err = error.response.data
-      if (err.message === 'Không được bỏ trống') {
-        document.getElementById("quantityErr").innerHTML = 'Không được bỏ trống'
-      } else if (err.quantity === 'Số lượng là số nguyên dương') {
-        document.getElementById("quantityErr").innerHTML = 'Số lượng là số nguyên dương'
+      const err = error.response.data;
+      if (err === "Không có mặt hàng này trong kho") {
+        document.getElementById("codeErr").innerHTML = "Không có mã hàng này";
+      } else if(err === "Không được để trống"){
+        document.getElementById("codeErr").innerHTML = "Không được để trống"
+      }else {
+        document.getElementById("codeErr").innerHTML = "";
+      }
+      if (err.message === "Không được bỏ trống") {
+        document.getElementById("quantityErr").innerHTML =
+          "Không được bỏ trống";
+      } else if (err.quantity === "Số lượng là số nguyên dương") {
+        document.getElementById("quantityErr").innerHTML =
+          "Số lượng là số nguyên dương";
+      } else if (err.quantity === "Chỉ được nhập tối đa 1000 sản phẩm") {
+        document.getElementById("quantityErr").innerHTML =
+          "Chỉ được nhập tối đa 1000 sản phẩm";
       } else {
-        document.getElementById("quantityErr").innerHTML = ''
+        document.getElementById("quantityErr").innerHTML = "";
+      }
+      if (err.size === "Không được để trống") {
+        document.getElementById("size-err").innerHTML = "Không được bỏ trống";
+      }else{
+        document.getElementById("size-err").innerHTML = ""
       }
     }
   };
 
   const handlePageProductClick = (event) => {
     setProductFilter((prev) => ({ ...prev, page: event.selected }));
-  }
+  };
 
   const handleSubmitDataEntry = async (values) => {
+    console.log(values);
     const newValues = {
       ...values,
-      employeeName: employeeName
+      employeeName: employeeName,
     };
     try {
-      await dataEntryService.update(newValues);
-      Swal.fire({
-        icon: "success",
-        title: "Nhập liệu thành công",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-      resetValues();
-      setFlag(false);
+      if (productCode === "" && productQuantity === "") {
+        swalWithBootstrapButtons.fire("Hủy", "Lỗi nhập liệu :)", "error");
+        setFlag(false);
+      } else {
+        await dataEntryService.update(newValues);
+        Swal.fire({
+          icon: "success",
+          title: "Nhập liệu thành công",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        resetValues();
+        setFlag(false);
+      }
     } catch (error) {
-      swalWithBootstrapButtons.fire("Hủy", "Lỗi nhập liệu :)", "error");
       console.warn(error);
     }
   };
 
   useEffect(() => {
     const getDataEntryProducts = async () => {
-      const dataEntryProductResponse = await dataEntryProductService.findAll();
-      setDataEntryProducts(dataEntryProductResponse.data);
+      try {
+        const dataEntryProductResponse =
+          await dataEntryProductService.findAll();
+        setDataEntryProducts(dataEntryProductResponse.data);
+      } catch (error) {
+        console.log(error);
+      }
     };
     getDataEntryProducts();
   }, [isSubmitting]);
 
   useEffect(() => {
     const getDataEntry = async () => {
-      const dataEntryResponse = await dataEntryService.getDetail();
-      setDataEntry(dataEntryResponse.data);
+      try {
+        const dataEntryResponse = await dataEntryService.getDetail();
+        setDataEntry(dataEntryResponse.data);
+      } catch (error) {
+        console.log(error);
+      }
     };
     getDataEntry();
   }, [isSubmitting]);
+
   useEffect(() => {
     const getProductSizes = async () => {
       const productSizesResponse = await productSizeService.findAllSize();
@@ -163,11 +195,11 @@ function DataEntry() {
       try {
         if (hideModal) {
           setProductFilter({
-            name: '',
-            page: 0
-          })
+            name: "",
+            page: 0,
+          });
         }
-        const productsResponse = await productService.search(productFilter);
+        const productsResponse = await productService.findByName(productFilter);
         setProducts(productsResponse.data.content);
         setProductPageCount(productsResponse.data.totalPages);
       } catch (error) {
@@ -175,35 +207,34 @@ function DataEntry() {
       }
     };
     getProducts();
-  }, [productFilter]);
+  }, [hideModal, productFilter]);
+
+  useEffect(() => {
+    document.title = "Nhập liệu";
+  }, []);
 
   return (
     <div className={styles.body}>
-
       <Formik
         initialValues={{
           dataEntryProduct: {
             quantity: "",
             delete: false,
             productDTO: "",
-            size: ""
+            size: '',
           },
           dataEntry: {
             employeeName: "",
           },
         }}
-        // validationSchema={Yup.object({
-        //   name: Yup.string().required("Required."),
-        //   email: Yup.string().required("Required.").email("abc@gmail.com"),
-        //   phone: Yup.string().required("Required."),
-        //   message: Yup.string().required("Required."),
-        // })}
-        onSubmit={(values) => {
+        onSubmit={(values, { resetForm }) => {
           console.log(values);
           if (!flag) {
             handleSubmitDataEntryProduct(values.dataEntryProduct);
+            resetForm();
           } else {
             handleSubmitDataEntry(values.dataEntry);
+            resetForm();
           }
         }}
       >
@@ -222,14 +253,22 @@ function DataEntry() {
                     <label htmlFor="" className="fw-bold">
                       Mã phiếu nhập <span className={styles.colon}>:</span>
                     </label>
-                    {isSubmitting ? <span> {dataEntry?.code}</span> : <span></span>}
+                    {isSubmitting ? (
+                      <span> {dataEntry?.code}</span>
+                    ) : (
+                      <span></span>
+                    )}
                   </div>
                   <div className="col-2" />
                   <div className="col-5">
                     <label htmlFor="" className="fw-bold">
                       Ngày tháng năm <span className={styles.colon}>:</span>{" "}
                     </label>
-                    {isSubmitting ? <span> {dataEntry?.date}</span> : <span></span>}
+                    {isSubmitting ? (
+                      <span> {dataEntry?.date}</span>
+                    ) : (
+                      <span></span>
+                    )}
                   </div>
                 </div>
                 <div className="row">
@@ -246,15 +285,18 @@ function DataEntry() {
                         <span className={styles.colon}>:</span>{" "}
                       </label>
                       <div className="col-6 col-lg-8 px-0">
-                        <Field
-                          type="text"
-                          className={`${styles["customer-input"]} ${styles["input_field"]} mx-0`}
-                          style={{ marginLeft: 8, width: "55%" }}
-                          id="product-code"
-                          name="productDTO"
-                          value={productCode}
-                          onChange={(e) => setValueOfProductCode(e)}
-                        />
+                        <div className="d-inline">
+                          <Field
+                            type="text"
+                            className={`${styles["customer-input"]} ${styles["input_field"]} mx-0`}
+                            style={{ marginLeft: 8, width: "55%" }}
+                            id="product-code"
+                            name="productDTO"
+                            value={productCode}
+                            onChange={(e) => setValueOfProductCode(e)}
+                          />
+                          
+                        </div>
 
                         <button
                           type="button"
@@ -266,7 +308,6 @@ function DataEntry() {
                             marginLeft: "22px",
                             marginBottom: "6px",
                           }}
-
                         >
                           <i className="bi bi-search" />{" "}
                           <span className="d-none d-xl-inline">
@@ -274,6 +315,9 @@ function DataEntry() {
                           </span>
                         </button>
                       </div>
+                    </div>
+                    <div className="d-flex justify-content-center">
+                    <span id="codeErr" className="text-danger"></span>
                     </div>
                     <div className={`${styles["input-search"]} row mb-3`}>
                       <label
@@ -293,8 +337,10 @@ function DataEntry() {
                         onChange={(e) => setValueOfProductQuantity(e)}
                       />
 
-                      <div id="quantityErr" className="text-danger text-center"></div>
-
+                      <div
+                        id="quantityErr"
+                        className="text-danger text-center"
+                      ></div>
                     </div>
                     <div className={`row mt-3 ${styles["input-search"]}`}>
                       <label
@@ -309,19 +355,24 @@ function DataEntry() {
                         className={`${styles["input_field"]} col-6 col-lg-8 me-3`}
                         name="dataEntryProduct.size"
                       >
-                        <option value={""}>--- Hãy chọn size ---</option>
+                        <option value={''}>--- Hãy chọn size ---</option>
                         {productSizes.map((productSize, index) => (
                           <option value={productSize.id} key={index}>
                             {productSize.name}
                           </option>
                         ))}
                       </Field>
+                      <div className="d-flex justify-content-center">
+                        <span  id="size-err" className="text-danger"></span>
+                      </div>
                     </div>
-                    <div className="row d-flex
-                     justify-content-center">
+                    <div
+                      className="row d-flex
+                     justify-content-center"
+                    >
                       <button
                         type="submit"
-                        className="btn btn-outline-primary"
+                        className="btn btn-outline-primary mt-3"
                         style={{ width: "150px" }}
                       >
                         Ghi thông tin
@@ -408,7 +459,6 @@ function DataEntry() {
               </div>
             </div>
           </div>
-
         </Form>
       </Formik>
       <ModalDeleteInvoice
@@ -417,15 +467,18 @@ function DataEntry() {
       />
 
       {/* {modal-product-search} */}
-      <div
-        className="modal fade"
-        id="exampleModal2"
-      >
+      <div className="modal fade" id="exampleModal2">
         <div className="row">
           <div className="col-3"></div>
-          <div className="modal-dialog col-9 w-100" style={{ marginTop: '100px', maxWidth: "800px" }}>
-            <div className="modal-content" style={{ position: 'relatative' }}>
-              <div className="modal-header justify-content-center" style={{ background: "#183661" }}>
+          <div
+            className="modal-dialog col-9 w-100"
+            style={{ marginTop: "100px", maxWidth: "800px" }}
+          >
+            <div className="modal-content" style={{ position: "relatative" }}>
+              <div
+                className="modal-header justify-content-center"
+                style={{ background: "#183661" }}
+              >
                 <h2 className="modal-title text-white" id="exampleModalLabel">
                   TRA CỨU HÀNG HÓA
                 </h2>
@@ -435,11 +488,10 @@ function DataEntry() {
                   data-bs-dismiss="modal"
                   aria-label="Close"
                   style={{
-                    position: 'absolute',
+                    position: "absolute",
                     top: 0,
-                    right: 0
+                    right: 0,
                   }}
-                  onClick={() => setHideModal(true)}
                 ></button>
               </div>
               <div className={styles["modal-body"]}>
@@ -449,9 +501,9 @@ function DataEntry() {
                       <div className="d-flex justify-content-between">
                         <Formik
                           initialValues={{
-                            name: productFilter.name,
+                            name: "",
                           }}
-                          onSubmit={(values) => {
+                          onSubmit={async (values) => {
                             setProductFilter((prev) => {
                               return { ...prev, ...values, page: 0 };
                             });

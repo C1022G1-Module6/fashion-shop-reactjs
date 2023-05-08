@@ -9,6 +9,15 @@ const search = ({name,productTypeId,page}) => {
     })
 }
 
+const findByName = ({name,page}) => {
+    const token = localStorage.getItem('token')
+    return request.get(`/api/user/product/?productName=${name ? name : '' }&page=${page?page:0}` ,{
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+}
+
 const saveProduct = (value) => {
     const token = localStorage.getItem('token')
     return request.post(`/api/user/product/create-product`, { ...value },{
@@ -42,6 +51,7 @@ const productService = {
     search,
     saveProduct,
     getAllProductDetail,
-    searchWithType
+    searchWithType,
+    findByName
 }
 export default productService

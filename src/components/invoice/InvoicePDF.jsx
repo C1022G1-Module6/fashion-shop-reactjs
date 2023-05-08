@@ -91,7 +91,7 @@ function InvoicePDF(props) {
                                 {props.invoice.discount?.toLocaleString("vi-VN", {
                                     style: "currency",
                                     currency: "VND",
-                                })}
+                                })}%
                             </span>
                         </div>
                         <div className="d-flex justify-content-between">

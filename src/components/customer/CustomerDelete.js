@@ -1,11 +1,11 @@
 import Swal from "sweetalert2";
-import customerService from "../../service/customer/CustomerService";
+import customerService from "../../service/customer/customerService";
 import React from "react";
 
 export default function CustomerDelete(props) {
     const handleDelete = async (id) => {
         try {
-            await customerService.deleteCustomer(id)
+           await customerService.deleteCustomer(id)
             Swal.fire({
                 icon: 'success',
                 title: 'Xóa thành công',

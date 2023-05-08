@@ -1,118 +1,122 @@
-import React, { useState } from 'react'
-import { useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
-import * as NotificationService from './service/NotificationService'
-import ReactPaginate from 'react-paginate';
-import './../notification/notifications.css'
+import React, { useState } from "react";
+import { useEffect } from "react";
+import { NavLink } from "react-router-dom";
+import * as NotificationService from "./service/NotificationService";
+import ReactPaginate from "react-paginate";
+import "./../notification/notifications.css";
 
 export default function Notification() {
-    const [pageCount, setPageCount] = useState(0)
-    let [count, setCount] = useState(1)
-    const [currentPage, setCurrentPage] = useState(0)
-    const [notification, setNotification] = useState([])
-    const listNotification = async () => {
-        let res = await NotificationService.getAllNotification(currentPage)
-        setNotification(res.data.content)
-        setPageCount(res.data.totalPages)
-       
-       
+  const [pageCount, setPageCount] = useState(0);
+  let [count, setCount] = useState(1);
+  console.log(count);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [notification, setNotification] = useState([]);
+  const listNotification = async () => {
+    let res = await NotificationService.getAllNotification(currentPage);
+    setNotification(res.data.content);
+    setPageCount(res.data.totalPages);
+  };
+  console.log(pageCount);
+  const handlePageClick = async (page) => {
+    setCurrentPage(page.selected);
+    const rs = await NotificationService.getAllNotification(page.selected);
+    setNotification(rs.data.content);
+    setCount(Math.ceil(rs.data.size * page.selected + 1));
+  };
 
-    }
-    console.log(pageCount);
-    const handlePageClick = async (page) => {
-        setCurrentPage(page.selected)
-        const rs = await NotificationService.getAllNotification( page.selected)
-        setNotification(rs.data.content)
-        setCount(Math.ceil(rs.data.size * page.selected + 1))
-    }
-   
-
-    console.log(notification);
+  console.log(notification);
+  const role = localStorage.getItem("roles");
+  useEffect(() => {
+    listNotification();
+  }, []);
 
     useEffect(() => {
-        listNotification()
-    }, [currentPage])
+    document.title = "Danh sách hàng hóa";
+  }, []);
 
-    return (
-        <>
-
-            <div className="container ">
-                <div className="row">
-                    <div className="col-12 bg-white">
-                        <h1 style={{ color: "white" }}> ?? </h1>
-                    </div>
-                </div>
-                <div className="row" >
-                    <div className="col-sm-12 col-md-3 col-xl-3 col-xxl-2 col-lg-3  ">
-                    </div>
-
-                    <div className="col-sm-12 col-md-6 col-xl-6 col-xxl-8 col-lg-6 text-center">
-                        <h1 style={{ backgroundColor: '#183661', color: "white" }}> THÔNG BÁO MỚI </h1>
-
-
-
-
-
-                        <div className="row">
-                            {  
-                                notification
-                                // ?.slice(currentPage * 3, currentPage * 3 + 3)
-                                ?.map((nitifyList, index ) => (
-                                    
-                                    <div  className="col-sm-12 col-md-6 col-xl-6 col-xxl-6 col-lg-6"  key={index}>
-                                        
-                                        <div className="caxrd h-100" style={{ boxShadow: "8px 8px 16px 8px rgba(0, 0, 0, 0.2)" }}>
-                                        
-
-                                            <img className="card-img-top" src={nitifyList.img} alt="" />
-
-                                            <div className="card-body">
-                                                <NavLink to={`/notifications/detail/${nitifyList.id}`} style={{ textDecoration: "none",color:'black' }}>
-                                                    <h4 className="card-title">{nitifyList.title}</h4>
-                                                </NavLink>
-
-                                            </div>
-                                            {/* <div className="card-footer">
-                            <small className="text-muted">Last updated 3 mins ago</small>
-                        </div> */}
-                        
-                                        </div>
-                                    </div>
-                                    
-                                ))
-                                
-                            }
+  return (
+    <>
+      <div className="row mx-0">
+        <div className="col-3"></div>
+        <div className="container col-7 mt-5 mx-auto">
+          <h1 style={{ backgroundColor: "#183661", color: "white" }}>
+            {" "}
+            THÔNG BÁO MỚI{" "}
+          </h1>
+          <div className="row ">
+            {role !== "ROLE_STORE_MANAGER"
+              ? notification
+                  .filter((niti) => niti.role === role)
+                  .map((nitifyList, index) => (
+                    <div key={index} className="col-sm-12 col-md-6 col-xl-6 col-xxl-6 col-lg-6 p-4">
+                      <div
+                        className="card h-100"
+                        style={{
+                          boxShadow: "8px 8px 16px 8px rgba(0, 0, 0, 0.2)",
+                        }}
+                      >
+                        <img
+                          className="card-img-top"
+                          src={nitifyList.img}
+                          alt=""
+                        />
+                        <div className="card-body">
+                          <NavLink
+                            to={`/notifications/detail/${nitifyList.id}`}
+                            style={{ textDecoration: "none", color: "black" }}
+                          >
+                            <h4 className="card-title">{nitifyList.title}</h4>
+                          </NavLink>
                         </div>
-
+                      </div>
                     </div>
-
-                    <div className="col-sm-12 col-md-3 col-xl-3 col-xxl-2 col-lg-3  ">
+                  ))
+              : notification.map((nitifyList, index) => (
+                  <div key={index} className="col-sm-12 col-md-6 col-xl-6 col-xxl-6 col-lg-6 p-4">
+                    <div
+                      className="card h-100"
+                      style={{
+                        boxShadow: "8px 8px 16px 8px rgba(0, 0, 0, 0.2)",
+                      }}
+                    >
+                      <img
+                        className="card-img-top"
+                        src={nitifyList.img}
+                        alt=""
+                      />
+                      <div className="card-body">
+                        <NavLink
+                          to={`/notifications/detail/${nitifyList.id}`}
+                          style={{ textDecoration: "none", color: "black" }}
+                        >
+                          <h4 className="card-title">{nitifyList.title}</h4>
+                        </NavLink>
+                      </div>
                     </div>
-                    
-                </div>
-                <div style={{marginLeft: '45%'}}>
-                <ReactPaginate
-                
+                  </div>
+                ))}
+            <div className="d-flex justify-content-center">
+              <ReactPaginate
                 breakLabel="..."
-                nextLabel=">"
+                nextLabel="trước"
                 onPageChange={handlePageClick}
                 pageCount={pageCount}
-                previousLabel="< "
+                previousLabel="sau"
                 containerClassName="pagination"
-                pageLinkClassName="page-num"
-                nextLinkClassName="page-next"
-                previousLinkClassName="page-previous"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
                 activeClassName="active"
+                activeLinkClassName="page-link"
                 disabledClassName="d-none"
               />
-                </div>
-                            
-
-              
-                
             </div>
-          
-        </>
-        
-    )
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
